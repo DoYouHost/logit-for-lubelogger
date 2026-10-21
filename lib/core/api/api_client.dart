@@ -14,7 +14,7 @@ import 'retry_interceptor.dart';
 
 /// Header LubeLogger uses to return culture-invariant payloads: typed JSON and
 /// ISO-8601 dates instead of locale-formatted strings. Sent on every request so
-/// parsing never depends on the server's locale. See `reference/LUBELOGGER-API.md`.
+/// parsing never depends on the server's locale. See docs/api-server.md.
 const String kCultureInvariantHeader = 'culture-invariant';
 
 /// Dio spends `sendTimeout` on the whole body in one `addStream`, so for an

@@ -79,7 +79,7 @@ enum RecordKind {
     RecordKind.tax => ExtraFieldRecordType.tax,
   };
 
-  // Uniform CRUD paths under the list [endpoint] (see LUBELOGGER-API.md §6):
+  // Uniform CRUD paths under the list [endpoint] (see docs/api-records.md):
   // all four types share the same add/update/delete route shape.
   String get addEndpoint => '$endpoint/add';
   String get updateEndpoint => '$endpoint/update';

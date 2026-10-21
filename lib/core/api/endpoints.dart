@@ -3,7 +3,7 @@
 /// Contract: LubeLogger (CarCareTracker) `x-api-key` API, verified against a
 /// live v1.6.9 instance + the server source (`reference/lubelog`). All paths
 /// are under `/api` on the server root (no version prefix). See
-/// `reference/LUBELOGGER-API.md` for the full contract, including the
+/// docs/api-records.md and docs/api-server.md for the contract, including the
 /// `culture-invariant` header requirement and the overloaded-401 behaviour.
 abstract final class Endpoints {
   static const apiPrefix = '/api';
@@ -103,7 +103,7 @@ abstract final class Endpoints {
 
   // Additional record types with their own shapes. Each is a uniform-CRUD list
   // endpoint under `/api/vehicle/` (POST `/add?vehicleId=`, PUT `/update`,
-  // DELETE `/delete?id=`); see LUBELOGGER-API.md §6.
+  // DELETE `/delete?id=`); see docs/api-records.md.
   static const supplyRecords = '$apiPrefix/vehicle/supplyrecords';
   static const supplyRecordsAdd = '$supplyRecords/add';
   static const supplyRecordsUpdate = '$supplyRecords/update';

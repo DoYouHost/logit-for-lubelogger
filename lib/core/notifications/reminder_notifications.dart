@@ -29,8 +29,8 @@ class ReminderAlert {
 /// part of the key on purpose: a LubeLogger reminder recurs by rolling its due
 /// target forward while keeping the same `id`, so keying on `id` alone would
 /// suppress every future cycle forever. When the target changes, the key
-/// changes and the reminder can alert again. See the reminder-notifications and
-/// lubelogger-record-write-constraints memories.
+/// changes and the reminder can alert again. See docs/api-server.md and
+/// docs/api-records.md.
 String reminderDueKey({
   required int vehicleId,
   required int reminderId,
