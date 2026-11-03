@@ -22,6 +22,7 @@ void main() {
       for (final pair in [
         (MeasurementSystem.metric, DistanceUnit.km),
         (MeasurementSystem.imperial, DistanceUnit.mi),
+        (MeasurementSystem.imperialUk, DistanceUnit.mi),
       ]) {
         final u = units(base: pair.$1, distance: pair.$2);
         expect(u.toDisplayDistance(100000), 100000);
@@ -47,8 +48,10 @@ void main() {
     test('a combustion vehicle keeps the established unit names', () {
       expect(units().economyLabel, 'L/100 km');
       expect(units(economy: FuelEconomyUnit.mpg).economyLabel, 'MPG');
+      expect(units(economy: FuelEconomyUnit.mpgUk).economyLabel, 'MPG (UK)');
       expect(units().consumptionLabel, 'L');
       expect(units(base: MeasurementSystem.imperial).consumptionLabel, 'gal');
+      expect(units(base: MeasurementSystem.imperialUk).consumptionLabel, 'L');
     });
 
     test('an electric vehicle reads in kWh', () {

@@ -41,6 +41,7 @@
   "settingsStorageBase": "Server data",
   "baseMetric": "Metric",
   "baseImperial": "Imperial",
+  "baseImperialUk": "Imperial (UK)",
   "currencyAuto": "Automatic ({symbol})",
   "@currencyAuto": {
     "placeholders": {

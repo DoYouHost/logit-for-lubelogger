@@ -62,21 +62,17 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   _SettingRow(
                     label: l10n.settingsStorageBase,
-                    control: SegmentedButton<MeasurementSystem>(
-                      showSelectedIcon: false,
-                      segments: [
-                        ButtonSegment(
-                          value: MeasurementSystem.metric,
-                          label: Text(l10n.baseMetric),
-                        ),
-                        ButtonSegment(
-                          value: MeasurementSystem.imperial,
-                          label: Text(l10n.baseImperial),
-                        ),
-                      ],
-                      selected: {units.base},
-                      onSelectionChanged: (s) => unitsCtl.setBase(s.first),
-                    ).tagged('settings.storageBase'),
+                    control: _Dropdown<MeasurementSystem>(
+                      id: 'settings.baseUnit',
+                      value: units.base,
+                      items: MeasurementSystem.values,
+                      labelOf: (s) => s == MeasurementSystem.imperial
+                          ? l10n.baseImperial
+                          : (s == MeasurementSystem.imperialUk
+                              ? l10n.baseImperialUk
+                              : l10n.baseMetric),
+                      onChanged: unitsCtl.setBase,
+                    ),
                   ),
                   _divider(t),
                   _SettingRow(

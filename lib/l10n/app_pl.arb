@@ -32,6 +32,7 @@
   "settingsStorageBase": "Dane serwera",
   "baseMetric": "Metryczne",
   "baseImperial": "Imperialne",
+  "baseImperialUk": "Imperialne (UK)",
   "currencyAuto": "Automatyczna ({symbol})",
   "settingsUnitsMetricNote": "Ustaw jednostki, w jakich Twój serwer LubeLogger zapisuje dane (metryczne = km i litry). Aplikacja przeliczy je do wybranych jednostek wyświetlania.",
   "settingsVisibleTabs": "Widoczne zakładki",

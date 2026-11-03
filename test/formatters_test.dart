@@ -60,6 +60,18 @@ void main() {
       expect(mpg, closeTo(626 / 50.370, 0.001)); // raw miles / raw gallons
     });
 
+    test('imperialUk base treats raw values as miles + litres', () {
+      // Same raw numbers, but interpreted as 626 mi on 50.37 litres.
+      final mpg = Formatters.fuelEconomyValue(
+        626,
+        50.370,
+        MeasurementSystem.imperialUk,
+        FuelEconomyUnit.mpgUk,
+      );
+      // raw miles / (raw litres * 0.219969)
+      expect(mpg, closeTo(626 / (50.370 * 0.219969), 0.001));
+    });
+
     test('returns null for zero distance or volume', () {
       expect(
         Formatters.fuelEconomyValue(0, 10, metric, FuelEconomyUnit.l100km),
@@ -89,6 +101,17 @@ void main() {
         Formatters.distance(
           100000,
           MeasurementSystem.imperial,
+          DistanceUnit.mi,
+        ),
+        '100,000 mi',
+      );
+    });
+
+    test('imperialUk base treats the raw value as miles', () {
+      expect(
+        Formatters.distance(
+          100000,
+          MeasurementSystem.imperialUk,
           DistanceUnit.mi,
         ),
         '100,000 mi',

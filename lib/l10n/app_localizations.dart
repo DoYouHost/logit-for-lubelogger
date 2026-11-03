@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Imperial'**
   String get baseImperial;
 
+  /// No description provided for @baseImperialUk.
+  ///
+  /// In en, this message translates to:
+  /// **'Imperial (UK)'**
+  String get baseImperialUk;
+
   /// No description provided for @currencyAuto.
   ///
   /// In en, this message translates to:

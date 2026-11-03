@@ -97,6 +97,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get baseImperial => 'Imperialne';
 
   @override
+  String get baseImperialUk => 'Imperialne (UK)';
+
+  @override
   String currencyAuto(String symbol) {
     return 'Automatyczna ($symbol)';
   }
