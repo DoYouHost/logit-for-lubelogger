@@ -11,7 +11,7 @@ enum AppErrorCode {
   /// credentials *or* a valid key/user with insufficient scope (the server
   /// returns 401 + a `{success:false}` body for both, never 403 for scope).
   /// So a 401 must NOT trigger an automatic logout — the credentials may be
-  /// fine and only the permission is lacking. See `reference/LUBELOGGER-API.md`.
+  /// fine and only the permission is lacking. See docs/api-server.md.
   unauthorized,
 
   /// 403 — reserved. LubeLogger's API rarely uses it (scope denial comes back

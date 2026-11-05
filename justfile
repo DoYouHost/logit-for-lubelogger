@@ -235,9 +235,10 @@ clean:
 # leave a published release with nothing to promote.
 
 # A release is cut from whatever is checked out: `_bump` commits here and
-# `release-publish` pushes here, so shipping off `dev` leaves main alone. One
-# definition for both, because a bump landing on a different branch than the
-# push would publish a release without its own version commit.
+# `release-publish` pushes here. `ship` insists on `release/X.Y.Z`, so main and
+# dev never receive a bump directly. One definition for both, because a bump
+# landing on a different branch than the push would publish a release without its
+# own version commit.
 [no-exit-message]
 _branch:
     #!/usr/bin/env bash
@@ -247,6 +248,60 @@ _branch:
         exit 1
     fi
     echo "$branch"
+
+# The branch name carries the version, so a typo in either one stops here instead
+# of publishing a release whose bump belongs to another version.
+[no-exit-message]
+_require-release-branch ver:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    branch=$(just _branch)
+    if [ "$branch" != "release/{{ver}}" ]; then
+        echo "ship {{ver}} runs from release/{{ver}}, not '$branch'. Start it with: just release-start {{ver}}" >&2
+        exit 1
+    fi
+
+# Opens the draft PR into main for release/<ver>; a no-op when one is open.
+# Fails when the branch has no commit over main — `release-start` tolerates
+# that (the bump commit is still to come), `release-publish` cannot.
+[no-exit-message]
+_release-pr ver:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    branch="release/{{ver}}"
+    open=$(gh pr list --repo {{repo}} --base main --head "$branch" --state open --json number --jq '.[0].number // empty')
+    if [ -n "$open" ]; then
+        echo "PR #$open already open for $branch"
+        exit 0
+    fi
+    gh pr create --repo {{repo}} --base main --head "$branch" --draft \
+        --title "chore: release {{ver}}" \
+        --body "Release {{ver}}: merges release/{{ver}} into main."
+
+# Cuts release/<ver> from <base> (default: the pushed tip of dev; a SHA or
+# origin/main for a hotfix works too), pushes it and opens its draft PR, so CI
+# runs on every change that is merged into the release from then on.
+# usage: just release-start X.Y.Z [BASE]
+[doc('cut release/X.Y.Z, push it and open its draft PR')]
+[group('4-release')]
+[no-exit-message]
+release-start ver base='origin/dev':
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! [[ {{ quote(ver) }} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "release-start takes X.Y.Z, got '{{ver}}'" >&2
+        exit 1
+    fi
+    branch="release/{{ver}}"
+    git fetch --quiet origin
+    if git show-ref --verify --quiet "refs/heads/$branch" || \
+        git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+        echo "$branch already exists; check it out instead." >&2
+        exit 1
+    fi
+    git switch --no-track -c "$branch" {{ quote(base) }}
+    git push -u origin "$branch"
+    just _release-pr {{ver}} || echo "No PR yet (nothing ahead of main?); \`just ship {{ver}}\` opens it."
 
 # versionCode = (major*10000 + minor*100 + patch) * 1000 (e.g. 1.2.3 → 10203000)
 # The trailing three zeros are the dev slots: `ship-dev` numbers the builds
@@ -260,15 +315,17 @@ _bump ver:
     #!/usr/bin/env bash
     set -euo pipefail
     branch=$(just _branch)
-    # A branch that exists only here — the first release cut from it — has
-    # nothing to rebase onto, and `git pull` would fail on the missing ref.
-    # `--exit-code` says 2 for that and 128 for "could not reach origin": only
-    # the first is a reason to skip the rebase, and swallowing the second would
-    # build the release on a tree that never caught up with the remote.
+    # A branch that exists only here has nothing to catch up with, and `git pull`
+    # would fail on the missing ref. `--exit-code` says 2 for that and 128 for
+    # "could not reach origin": only the first is a reason to skip the pull, and
+    # swallowing the second would build the release on a tree that never caught
+    # up with the remote.
     rc=0
     git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1 || rc=$?
     case $rc in
-        0) git pull --rebase --autostash origin "$branch" ;;
+        # --ff-only, not --rebase: a release branch carries merge commits from
+        # dev, and a rebase on a diverged branch would flatten them.
+        0) git pull --ff-only --autostash origin "$branch" ;;
         2) echo "origin has no $branch yet — first release from this branch" ;;
         *) echo "Cannot read origin (git ls-remote exited $rc)." >&2; exit 1 ;;
     esac
@@ -317,6 +374,7 @@ _upload-asset tag file:
 [doc('bump, test, build and publish a stable release')]
 [group('4-release')]
 ship ver:
+    just _require-release-branch {{ver}}
     just _bump {{ver}}
     just test
     just build
@@ -491,6 +549,9 @@ release-publish ver:
     # release in one server-side call. This avoids the race where we push a tag
     # and immediately reference it before the server has indexed it.
     git push origin "HEAD:refs/heads/$branch"
+    # Normally opened by `release-start`; this covers a branch cut when it had
+    # nothing ahead of main, and a PR closed by hand.
+    just _release-pr {{ver}}
     # Skip creating the release if it already exists (e.g. a previous run got
     # this far before failing), so the pipeline can be resumed safely.
     if gh release view "v{{ver}}" --repo {{repo}} >/dev/null 2>&1; then
@@ -502,6 +563,10 @@ release-publish ver:
             --title "v{{ver}}" --notes ""
     fi
     just _upload-asset "v{{ver}}" {{apk}}
+    # Published, so the draft PR is now the only thing left to merge.
+    if [ "$(gh pr view "$branch" --repo {{repo}} --json isDraft --jq .isDraft)" = "true" ]; then
+        gh pr ready "$branch" --repo {{repo}}
+    fi
     # Sync the server-created tag back to the local repo.
     git fetch --tags origin
 

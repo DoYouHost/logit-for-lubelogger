@@ -5,8 +5,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/app_diagnostics"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.3.1"
@@ -14,8 +14,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "packages/app_guards"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.1.0"
@@ -32,8 +32,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/app_report_ui"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.1.5"
@@ -41,8 +41,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/app_util"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.2.4"
@@ -162,8 +162,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/dash_kit"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.1.4"
@@ -171,8 +171,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/dash_ui"
-      ref: "v0.12.1"
-      resolved-ref: "95749ce1f52859f6a2af9a9c64df112e0c731461"
+      ref: "v0.12.2"
+      resolved-ref: "5e864fb3ebf1423b4d22c51b966893ee7ed4e922"
       url: "https://github.com/DoYouHost/app-shared.git"
     source: git
     version: "0.3.2"
