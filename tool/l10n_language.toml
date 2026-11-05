@@ -31,6 +31,8 @@ known_words = [
   "mo", "yr",
   # English the Polish copy quotes verbatim: "Licencje open source".
   "open", "source",
+  # The server's own setting, named as its web UI spells it.
+  "Use", "Calculation",
 ]
 
 # Each file with its LanguageTool language and the plural arm whose wording

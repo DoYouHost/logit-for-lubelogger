@@ -10,11 +10,13 @@ import 'package:intl/intl.dart';
 // amounts are never converted, matching how LubeLogger itself works.
 
 /// How the LubeLogger server stores raw distance/volume values. [imperial]
-/// assumes miles + US gallons (UK-gallon storage is an unsupported edge case;
-/// pick metric or use MPG (UK) as the display unit instead).
+/// assumes miles + US gallons; [imperialUk] is miles + litres, which is what a
+/// server with "Use UK MPG Calculation" on stores (it converts to UK gallons only
+/// when it computes MPG itself).
 enum MeasurementSystem {
   metric(kmPerUnit: 1, litresPerUnit: 1),
-  imperial(kmPerUnit: 1.609344, litresPerUnit: 3.785411784);
+  imperial(kmPerUnit: 1.609344, litresPerUnit: 3.785411784),
+  imperialUk(kmPerUnit: 1.609344, litresPerUnit: 1);
 
   const MeasurementSystem({
     required this.kmPerUnit,
@@ -27,9 +29,9 @@ enum MeasurementSystem {
   /// Litres per one stored volume unit.
   final double litresPerUnit;
 
-  /// Short label for the stored volume unit (litres vs US gallons) — used for
+  /// Short label for the stored volume unit (litres or US gallons) — used for
   /// the fuel table's price-per-volume column header.
-  String get volumeLabel => this == MeasurementSystem.metric ? 'L' : 'gal';
+  String get volumeLabel => this == MeasurementSystem.imperial ? 'gal' : 'L';
 }
 
 /// Currency symbol shown next to money values. [auto] defers to the server's
