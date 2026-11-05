@@ -63,14 +63,14 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsStorageBase,
                     control: _Dropdown<MeasurementSystem>(
-                      id: 'settings.baseUnit',
+                      id: 'settings.storageBase',
                       value: units.base,
                       items: MeasurementSystem.values,
-                      labelOf: (s) => s == MeasurementSystem.imperial
-                          ? l10n.baseImperial
-                          : (s == MeasurementSystem.imperialUk
-                              ? l10n.baseImperialUk
-                              : l10n.baseMetric),
+                      labelOf: (s) => switch (s) {
+                        MeasurementSystem.metric => l10n.baseMetric,
+                        MeasurementSystem.imperial => l10n.baseImperial,
+                        MeasurementSystem.imperialUk => l10n.baseImperialUk,
+                      },
                       onChanged: unitsCtl.setBase,
                     ),
                   ),
@@ -222,8 +222,8 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   _SettingRow(
                     label: l10n.settingsStoredData,
-                    control: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    control: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           l10n.settingsStoredDataSize(
@@ -610,10 +610,19 @@ class _SettingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = DashTokens.of(context);
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
+    // A Wrap, not a Row: when the control is too wide to share the line (narrow
+    // phone, large text), it drops below the label instead of squeezing the
+    // label into a column of single letters. Full width so spaceBetween can
+    // push a control that shares the line to the right edge.
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: DashSpace.md,
+        runSpacing: DashSpace.sm,
+        children: [
+          Text(
             label,
             style: TextStyle(
               fontFamily: DashTokens.fontUi,
@@ -622,10 +631,9 @@ class _SettingRow extends StatelessWidget {
               color: t.textPrimary,
             ),
           ),
-        ),
-        const SizedBox(width: DashSpace.md),
-        control,
-      ],
+          control,
+        ],
+      ),
     );
   }
 }

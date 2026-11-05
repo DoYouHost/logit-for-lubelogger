@@ -32,9 +32,9 @@
   "settingsStorageBase": "Dane serwera",
   "baseMetric": "Metryczne",
   "baseImperial": "Imperialne",
-  "baseImperialUk": "Imperialne (UK)",
+  "baseImperialUk": "Mile i litry (UK MPG)",
   "currencyAuto": "Automatyczna ({symbol})",
-  "settingsUnitsMetricNote": "Ustaw jednostki, w jakich Twój serwer LubeLogger zapisuje dane (metryczne = km i litry). Aplikacja przeliczy je do wybranych jednostek wyświetlania.",
+  "settingsUnitsMetricNote": "Ustaw jednostki, w jakich Twój serwer LubeLogger zapisuje dane (metryczne = km i litry). Jeśli na serwerze włączono „Use UK MPG Calculation”, wybierz Mile i litry (UK MPG). Aplikacja przeliczy dane do wybranych jednostek wyświetlania.",
   "settingsVisibleTabs": "Widoczne zakładki",
   "settingsVisibleTabsNote": "Wybierz, które zakładki mają się pojawiać na ekranie pojazdu i w menu dodawania, oraz przeciągnij, aby zmienić ich kolejność. Pulpit jest zawsze pokazywany jako pierwszy.",
 

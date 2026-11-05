@@ -97,7 +97,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get baseImperial => 'Imperialne';
 
   @override
-  String get baseImperialUk => 'Imperialne (UK)';
+  String get baseImperialUk => 'Mile i litry (UK MPG)';
 
   @override
   String currencyAuto(String symbol) {
@@ -106,7 +106,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsUnitsMetricNote =>
-      'Ustaw jednostki, w jakich Twój serwer LubeLogger zapisuje dane (metryczne = km i litry). Aplikacja przeliczy je do wybranych jednostek wyświetlania.';
+      'Ustaw jednostki, w jakich Twój serwer LubeLogger zapisuje dane (metryczne = km i litry). Jeśli na serwerze włączono „Use UK MPG Calculation”, wybierz Mile i litry (UK MPG). Aplikacja przeliczy dane do wybranych jednostek wyświetlania.';
 
   @override
   String get settingsVisibleTabs => 'Widoczne zakładki';

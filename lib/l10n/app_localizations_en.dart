@@ -96,7 +96,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get baseImperial => 'Imperial';
 
   @override
-  String get baseImperialUk => 'Imperial (UK)';
+  String get baseImperialUk => 'Miles & liters (UK MPG)';
 
   @override
   String currencyAuto(String symbol) {
@@ -105,7 +105,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsUnitsMetricNote =>
-      'Set the units your LubeLogger server stores values in (metric = km & liters). The app converts them to your chosen display units.';
+      'Set the units your LubeLogger server stores values in (metric = km & liters). If the server has “Use UK MPG Calculation” turned on, pick Miles & liters (UK MPG). The app converts the values to your chosen display units.';
 
   @override
   String get settingsVisibleTabs => 'Visible tabs';

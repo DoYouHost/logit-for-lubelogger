@@ -41,14 +41,14 @@
   "settingsStorageBase": "Server data",
   "baseMetric": "Metric",
   "baseImperial": "Imperial",
-  "baseImperialUk": "Imperial (UK)",
+  "baseImperialUk": "Miles & liters (UK MPG)",
   "currencyAuto": "Automatic ({symbol})",
   "@currencyAuto": {
     "placeholders": {
       "symbol": { "type": "String" }
     }
   },
-  "settingsUnitsMetricNote": "Set the units your LubeLogger server stores values in (metric = km & liters). The app converts them to your chosen display units.",
+  "settingsUnitsMetricNote": "Set the units your LubeLogger server stores values in (metric = km & liters). If the server has “Use UK MPG Calculation” turned on, pick Miles & liters (UK MPG). The app converts the values to your chosen display units.",
   "settingsVisibleTabs": "Visible tabs",
   "settingsVisibleTabsNote": "Choose which record tabs appear on the vehicle screen and in the add menu, and drag to reorder them. The Dashboard is always shown first.",
 

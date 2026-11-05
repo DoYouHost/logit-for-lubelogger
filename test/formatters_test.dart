@@ -60,16 +60,26 @@ void main() {
       expect(mpg, closeTo(626 / 50.370, 0.001)); // raw miles / raw gallons
     });
 
-    test('imperialUk base treats raw values as miles + litres', () {
-      // Same raw numbers, but interpreted as 626 mi on 50.37 litres.
+    test('imperialUk base matches the server\'s own UK MPG', () {
+      // Same raw numbers as a UK MPG server stores them: 626 mi on 50.37 L.
       final mpg = Formatters.fuelEconomyValue(
         626,
         50.370,
         MeasurementSystem.imperialUk,
         FuelEconomyUnit.mpgUk,
       );
-      // raw miles / (raw litres * 0.219969)
-      expect(mpg, closeTo(626 / (50.370 * 0.219969), 0.001));
+      // GasHelper.GetGasRecordViewModels divides the litres by 4.546.
+      expect(mpg, closeTo(626 / (50.370 / 4.546), 0.01));
+    });
+
+    test('imperialUk base reads the litres as-is for L/100 km', () {
+      final v = Formatters.fuelEconomyValue(
+        626,
+        50.370,
+        MeasurementSystem.imperialUk,
+        FuelEconomyUnit.l100km,
+      );
+      expect(v, closeTo(50.370 / (626 * 1.609344) * 100, 0.001));
     });
 
     test('returns null for zero distance or volume', () {
