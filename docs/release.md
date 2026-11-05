@@ -8,7 +8,7 @@ before adding a plugin or referencing an Android resource by name.**
 
 ## `just ship X.Y.Z`
 
-Runs, in this order: `_bump`, `test`, `build` (APK), `build-aab`,
+Runs, in this order: `_require-release-branch`, `_bump`, `test`, `build` (APK), `build-aab`,
 `release-publish`, `aab-show`, `play-internal` (see [`justfile`](../justfile)).
 The APK goes to a GitHub Release (users update through Obtainium); the Play
 bundle goes to **internal testing**. Promoting to production stays a click in
@@ -34,12 +34,15 @@ recipes call `gh --repo`.
   <SHA>` creates tag and release in one call. Use the SHA, not the branch name:
   the tip can move between the push and the call. Notes are empty on purpose;
   the Play/Obtainium changelog is written by hand afterwards.
-- **A release goes out from the checked-out branch, not from a fixed one.**
+- **A stable release goes out from `release/X.Y.Z` and nowhere else**
+  (`_require-release-branch`; the flow is in [branching.md](branching.md)).
   `_branch` (shared by `_bump` and `release-publish`) refuses a detached HEAD.
-  `_bump` rebases onto `origin <that branch>` and skips the rebase only when
-  `ls-remote --exit-code` returns **2** (no such branch yet); it aborts on any
+  `_bump` fast-forwards onto `origin <that branch>` (`--ff-only`, a rebase would
+  flatten the merge commits a release branch carries) and skips the pull only
+  when `ls-remote --exit-code` returns **2** (no such branch yet); it aborts on any
   other code, so an unreachable origin cannot yield a release built on a stale
-  tree.
+  tree. `release-publish` makes sure the draft PR into `main` exists and marks it
+  ready once the release is published.
 - **Every step is resumable.** `_bump` skips the edit and commit when the version
   is already bumped; `release-publish` skips an existing release;
   `_upload-asset` skips an asset that is already attached. Re-run the same

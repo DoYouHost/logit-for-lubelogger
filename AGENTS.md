@@ -7,16 +7,27 @@ LubeLogger.
 
 ## CI is the answer to most questions
 
-Every pull request into `main` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
+Every pull request into `main` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
 `flutter pub get --enforce-lockfile`, `dart format --output=none
 --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test` and a debug
-APK compile. A pull request that touches only docs, `site/`, `store-assets/` or
-`*.md` skips the build and still reports green.
+APK compile. A pull request that touches only `docs/`, `site/`, `reference/` or
+`*.md` skips everything after the path check and still reports green. It runs on
+GitHub-hosted runners as parallel jobs (analyze, test, build) behind one
+`analyze · test · build` job, the status `main` requires. The pull request is
+opened as a draft by `just release-start`, so CI runs on every push to
+`release/X.Y.Z` through it; there is no `push` trigger, which would run it twice.
+A pull request into `dev` gets the same run, but nothing there requires it, and a
+topic branch without a pull request gets no run at all
+([docs/branching.md](docs/branching.md)).
 
 **Before you ask a question, check the CI result and fix what is red** (`gh run list
 --branch <branch>`, `gh run view <id> --log-failed`). **Ask only about product
-decisions** — what a feature should do, which trade-off is wanted. Reproduce the
-checks locally before pushing:
+decisions** — what a feature should do, which trade-off is wanted.
+
+**No full local suite before a commit.** While you work, run the tests of what you
+touched. The gate is the GitHub run: after a push to `release/*`, **monitor it**
+(`gh run list --branch release/X.Y.Z`, `gh run watch <id>`) until it is green, and
+do not `just ship` before it is. The same checks, when you want one sooner:
 
 ```sh
 dart format lib test tool
@@ -72,9 +83,10 @@ inside an unrelated change and do not stay silent.
   `app_localizations*.dart`. User-visible text goes through `AppLocalizations`,
   never hardcoded.
 - `test/` mirrors `lib/`. `tool/` holds guard configs and `scroll_bench.sh`.
-- `justfile` — `just test`, `l10n-check`, `l10n-glue`, `run`, `build`, `ship X.Y.Z`,
-  `ship-dev`. **`just hooks` once per clone** points git at `.githooks/`, which
-  refuses a commit message that is not one Conventional Commits line.
+- `justfile` — `just test`, `l10n-check`, `l10n-glue`, `run`, `build`,
+  `release-start X.Y.Z`, `ship X.Y.Z`, `ship-dev`. **`just hooks` once per clone**
+  points git at `.githooks/`, which refuses a commit message that is not one
+  Conventional Commits line.
 - One Android flavor (no `--flavor`), one `main` entry point.
 
 ## Documentation
@@ -96,6 +108,10 @@ inside an unrelated change and do not stay silent.
   log field, a control or a report path.**
 - [docs/performance.md](docs/performance.md) — measuring before claiming, and the
   scroll benchmark harness.
+- [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `main`:
+  what each branch is for, how a release is cut and merged, why a release PR is never
+  squashed and why `main` goes back into `dev`. **Read it before opening a PR into
+  `main` or running `ship`.**
 - [docs/release.md](docs/release.md) — `ship`, `ship-dev`, the version-code scheme,
   R8 and resource-shrinking traps that only show in a release build. **Read it
   before touching a recipe, the proguard rules or adding a plugin.**
@@ -129,8 +145,9 @@ inside an unrelated change and do not stay silent.
 - **Anything reflective, or any Android resource referenced by a name string, must
   be tried on a release build**: CI builds debug only, and R8 and resource shrinking
   break things only there ([docs/release.md](docs/release.md)).
-- **Release only through `just ship` / `just ship-dev`.** Never push a tag by hand
-  and never change `applicationId`.
+- **Release only through `just ship` / `just ship-dev`**, a stable one from
+  `release/X.Y.Z` cut by `just release-start` ([docs/branching.md](docs/branching.md)).
+  Never push a tag by hand and never change `applicationId`.
 - **Bump every `app-shared` ref together**; `app_report_client` must match the ref
   `app_diagnostics` names ([docs/shared-packages.md](docs/shared-packages.md)).
 - **Diagnostics:** `relayBaseUrl` must not end in a slash; every new log field with

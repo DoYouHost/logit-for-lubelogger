@@ -1,51 +1,42 @@
 name: CI
 
-# The "is it done?" signal for pull requests. Everything here is what `just test`
-# plus a compile would tell you locally, so a green run means the branch builds
-# and behaves; a red one is homework, not a question for the reviewer.
-#
-# Runs on the self-hosted runners (label `flutter`), which already carry the
-# Flutter SDK, the Android SDK and a warm Gradle/pub cache — a hosted runner
-# would spend most of the wall clock re-downloading them.
+# What `just test` plus a compile would tell you locally.
+# @claude reads this run before asking a question.
+# GitHub-hosted runners: free for a public repo, one VM per job, no shared CPU.
 
 on:
   pull_request:
-    branches: [main]
-    # No paths-ignore here, deliberately — see "Does this change need a build?"
-    # below, which holds the same list. A `paths-ignore` decides whether the
-    # workflow RUNS, and a workflow that does not run reports no check at all;
-    # once "analyze · test · build" became a required status on main that left
-    # a docs-only pull request waiting forever on a check that could never arrive.
+    # dev too, so a contributor's pull request shows its result; only main
+    # requires the check.
+    branches: [main, dev]
+    # No paths-ignore: a workflow that does not run reports no check, and the
+    # required status on main would wait forever. The filter is the `changes` job.
   workflow_dispatch:
 
-# A force-push should not leave the previous run burning a runner for a commit
-# nobody will look at again.
+# A force-push cancels the previous run.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
-  # Reading which files a pull request touches, for the path filter below.
+  # Reading which files a pull request touches, for the `changes` job.
   pull-requests: read
 
-jobs:
-  check:
-    name: analyze · test · build
-    runs-on: [self-hosted, flutter]
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
+env:
+  FLUTTER_VERSION: "3.47.7"
 
-      # The list that used to be `paths-ignore`. Deciding it here instead keeps
-      # the check reported: steps skipped by `if:` still land in a job that
-      # succeeds, which is what a required status needs to see. Anything this
-      # cannot determine — a non-PR event, an API that will not answer, a pull
-      # request larger than the pages read — falls through to building, because
-      # the expensive mistake is skipping a change that breaks the app.
-      - name: Does this change need a build?
+jobs:
+  # Decided here instead of `paths-ignore`, so the required check is still
+  # reported. Anything undeterminable falls through to building.
+  changes:
+    name: Does this change need a build?
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.relevant.outputs.run }}
+    steps:
+      - name: Changed files
         id: relevant
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,8 +77,7 @@ jobs:
             exit 0
           fi
 
-          # `case` globs span slashes, so site/* covers site/a/b and *.md covers
-          # any depth — the same reach the old "site/**" / "**/*.md" had.
+          # `case` globs span slashes: site/* covers site/a/b, *.md any depth.
           needs_build=false
           while IFS= read -r f; do
             [ -z "$f" ] && continue
@@ -104,36 +94,81 @@ jobs:
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Which SDK actually ran matters when a failure reproduces nowhere else.
-      - name: Toolchain
-        if: steps.relevant.outputs.run == 'true'
-        run: flutter --version
+  analyze:
+    name: analyze
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      # --enforce-lockfile: a stale lock fails here instead of quietly resolving
+      # a plugin no developer has (it once broke the generated plugin registrant).
+      - run: flutter pub get --enforce-lockfile
+      # Fix a red run with `dart format lib test tool`, never by hand.
+      - run: dart format --output=none --set-exit-if-changed lib test tool
+      - run: flutter analyze
 
-      # --enforce-lockfile, so a stale lock fails here instead of quietly
-      # resolving something else. That is the failure this repository already
-      # had: the lock was not committed, CI picked a newer workmanager_android
-      # than any developer had, and the build died in the generated plugin
-      # registrant with a class that does not exist.
-      - name: Dependencies
-        if: steps.relevant.outputs.run == 'true'
-        run: flutter pub get --enforce-lockfile
+  test:
+    name: test
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: flutter test --concurrency=4
 
-      # Style is not a judgement call any more: `dart format` is the whole of
-      # it, so a diff carries only the change it is about. Fix a red run with
-      # `dart format lib test tool`, never by hand.
-      - name: Format
-        if: steps.relevant.outputs.run == 'true'
-        run: dart format --output=none --set-exit-if-changed lib test tool
-
-      - name: Analyze
-        if: steps.relevant.outputs.run == 'true'
-        run: flutter analyze
-
-      - name: Test
-        if: steps.relevant.outputs.run == 'true'
-        run: flutter test
-
-      # One flavour here, unlike bambuddy: this app ships a single APK.
+  build:
+    name: build
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
       - name: Compile check
-        if: steps.relevant.outputs.run == 'true'
         run: flutter build apk --debug --target-platform android-arm64
+
+  # The one status main requires. A skipped job (docs-only change) counts as
+  # passed; a failed or cancelled one does not.
+  check:
+    name: analyze · test · build
+    needs: [changes, analyze, test, build]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every job passed or was skipped
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case " $results " in *" failure "*|*" cancelled "*) exit 1 ;; esac
