@@ -4,6 +4,7 @@ import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../format/chart_range.dart';
+import '../format/fuel_entry_mode.dart';
 import '../models/vehicle_tab.dart';
 import 'server_profile.dart';
 import 'units_settings.dart';
@@ -20,6 +21,7 @@ class SettingsRepository {
   static const _remindersEnabledKey = 'reminder_notifications_enabled';
   static const _backgroundRefreshKey = 'background_refresh_enabled';
   static const _chartRangeKey = 'chart_default_range';
+  static const _fuelEntryModeKey = 'fuel_entry_mode';
 
   final SharedPreferences _prefs;
 
@@ -134,6 +136,18 @@ class SettingsRepository {
   Future<void> saveChartDefaultRange(ChartRangePreset preset) {
     _logChange('chart_range', preset.name);
     return _prefs.setString(_chartRangeKey, preset.name);
+  }
+
+  /// The two values the fuel form asks for. The original pair (total cost and
+  /// fuel amount) until the user switches; an unknown stored name falls back to
+  /// that too.
+  FuelEntryMode loadFuelEntryMode() =>
+      FuelEntryMode.byName(_prefs.getString(_fuelEntryModeKey) ?? '') ??
+      FuelEntryMode.costAndFuel;
+
+  Future<void> saveFuelEntryMode(FuelEntryMode mode) {
+    _logChange('fuel_entry_mode', mode.name);
+    return _prefs.setString(_fuelEntryModeKey, mode.name);
   }
 
   /// The diagnostic recording in progress, over the preferences key both
