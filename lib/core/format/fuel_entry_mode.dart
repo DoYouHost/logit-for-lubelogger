@@ -32,7 +32,7 @@ const _pow10 = [1.0, 10.0, 100.0, 1000.0];
 /// amount the server would refuse because it is not above zero). Fuel and cost
 /// are what the record stores, so they are rounded to what a pump and a receipt
 /// show (3 and 2 places); the price is derived only in [FuelEntryMode.costAndFuel],
-/// where it fills a read-only field.
+/// where the form keeps it hidden until the user switches to a mode that types it.
 double? deriveFuelEntry(
   FuelEntryMode mode, {
   double? price,

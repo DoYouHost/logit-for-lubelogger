@@ -638,6 +638,29 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String formFuelPriceLabel(String unit) {
+    return 'Cena paliwa (za $unit)';
+  }
+
+  @override
+  String formEnergyPriceLabel(String unit) {
+    return 'Cena energii (za $unit)';
+  }
+
+  @override
+  String get formEntryModeHint =>
+      'Wpisz dwie wartości, trzecia zostanie wyliczona';
+
+  @override
+  String get formEntryModeCostAmount => 'Koszt + ilość';
+
+  @override
+  String get formEntryModePriceCost => 'Cena + koszt';
+
+  @override
+  String get formEntryModePriceAmount => 'Cena + ilość';
+
+  @override
   String get formFillToFull => 'Do pełna';
 
   @override

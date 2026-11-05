@@ -328,6 +328,23 @@
       "unit": { "type": "String" }
     }
   },
+  "formFuelPriceLabel": "Fuel price (per {unit})",
+  "@formFuelPriceLabel": {
+    "placeholders": {
+      "unit": { "type": "String" }
+    }
+  },
+  "formEnergyPriceLabel": "Energy price (per {unit})",
+  "@formEnergyPriceLabel": {
+    "description": "Charging-session price field; unit is kWh",
+    "placeholders": {
+      "unit": { "type": "String" }
+    }
+  },
+  "formEntryModeHint": "Type two values, the third is calculated",
+  "formEntryModeCostAmount": "Cost + amount",
+  "formEntryModePriceCost": "Price + cost",
+  "formEntryModePriceAmount": "Price + amount",
   "formFillToFull": "Filled to full",
   "formMissedFuelUp": "Missed fuel-up (skip economy)",
   "formTagsOptional": "Tags (optional)",
