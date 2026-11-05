@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Imperial'**
   String get baseImperial;
 
+  /// No description provided for @baseImperialUk.
+  ///
+  /// In en, this message translates to:
+  /// **'Miles & liters (UK MPG)'**
+  String get baseImperialUk;
+
   /// No description provided for @currencyAuto.
   ///
   /// In en, this message translates to:
@@ -275,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsUnitsMetricNote.
   ///
   /// In en, this message translates to:
-  /// **'Set the units your LubeLogger server stores values in (metric = km & liters). The app converts them to your chosen display units.'**
+  /// **'Set the units your LubeLogger server stores values in (metric = km & liters). If the server has “Use UK MPG Calculation” turned on, pick Miles & liters (UK MPG). The app converts the values to your chosen display units.'**
   String get settingsUnitsMetricNote;
 
   /// No description provided for @settingsVisibleTabs.
