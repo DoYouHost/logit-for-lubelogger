@@ -1220,30 +1220,6 @@ abstract class AppLocalizations {
   /// **'Energy price (per {unit})'**
   String formEnergyPriceLabel(String unit);
 
-  /// No description provided for @formEntryModeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Type two values, the third is calculated'**
-  String get formEntryModeHint;
-
-  /// No description provided for @formEntryModeCostAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Cost + amount'**
-  String get formEntryModeCostAmount;
-
-  /// No description provided for @formEntryModePriceCost.
-  ///
-  /// In en, this message translates to:
-  /// **'Price + cost'**
-  String get formEntryModePriceCost;
-
-  /// No description provided for @formEntryModePriceAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Price + amount'**
-  String get formEntryModePriceAmount;
-
   /// No description provided for @formFillToFull.
   ///
   /// In en, this message translates to:

@@ -24,7 +24,6 @@ import 'core/diagnostics/report_config.dart';
 import 'core/diagnostics/session_facts.dart';
 import 'core/format/chart_range.dart';
 import 'core/format/expense_timeline.dart';
-import 'core/format/fuel_entry_mode.dart';
 import 'core/format/gas_stats.dart';
 import 'core/format/vehicle_units.dart';
 import 'core/models/dated_cost.dart';
@@ -120,24 +119,6 @@ class VisibleTabsNotifier extends Notifier<Set<VehicleTab>> {
     }
     await ref.read(settingsRepositoryProvider).saveVisibleTabs(next);
     state = next;
-  }
-}
-
-/// Which two of price, total cost and fuel amount the fuel form asks for,
-/// remembered from one fill-up to the next.
-final fuelEntryModeProvider =
-    NotifierProvider<FuelEntryModeNotifier, FuelEntryMode>(
-      FuelEntryModeNotifier.new,
-    );
-
-class FuelEntryModeNotifier extends Notifier<FuelEntryMode> {
-  @override
-  FuelEntryMode build() =>
-      ref.watch(settingsRepositoryProvider).loadFuelEntryMode();
-
-  Future<void> set(FuelEntryMode mode) async {
-    await ref.read(settingsRepositoryProvider).saveFuelEntryMode(mode);
-    state = mode;
   }
 }
 

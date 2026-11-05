@@ -98,11 +98,4 @@ void main() {
       );
     });
   });
-
-  test('byName round-trips every mode and rejects an unknown one', () {
-    for (final mode in FuelEntryMode.values) {
-      expect(FuelEntryMode.byName(mode.name), mode);
-    }
-    expect(FuelEntryMode.byName('nonsense'), isNull);
-  });
 }

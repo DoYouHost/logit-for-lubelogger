@@ -648,19 +648,6 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get formEntryModeHint =>
-      'Wpisz dwie wartości, trzecia zostanie wyliczona';
-
-  @override
-  String get formEntryModeCostAmount => 'Koszt + ilość';
-
-  @override
-  String get formEntryModePriceCost => 'Cena + koszt';
-
-  @override
-  String get formEntryModePriceAmount => 'Cena + ilość';
-
-  @override
   String get formFillToFull => 'Do pełna';
 
   @override

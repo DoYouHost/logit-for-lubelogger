@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lubelogger_mobile/core/format/fuel_entry_mode.dart';
 import 'package:lubelogger_mobile/core/format/vehicle_units.dart';
 import 'package:lubelogger_mobile/core/models/gas_record.dart';
 import 'package:lubelogger_mobile/core/settings/units_settings.dart';
@@ -14,7 +13,6 @@ import 'package:lubelogger_mobile/features/vehicle/forms/add_fuel_form.dart';
 import 'package:lubelogger_mobile/l10n/app_localizations.dart';
 import 'package:lubelogger_mobile/l10n/app_localizations_en.dart';
 import 'package:lubelogger_mobile/providers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final en = AppLocalizationsEn();
 
@@ -42,7 +40,8 @@ class _CapturingAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-/// The fuel form's data entry modes, driven through the real form.
+/// The fuel form shows price, amount and total cost together: the first two
+/// typed in give the third, live, and the third is greyed out meanwhile.
 void main() {
   const vehicleId = 1;
   const units = VehicleUnits(UnitsSettings());
@@ -50,45 +49,36 @@ void main() {
   final fuel = en.formFuelLabel(units.consumptionLabel);
   final cost = en.colCost;
 
-  late ProviderContainer container;
-
   Future<_CapturingAdapter> pump(
     WidgetTester tester, {
-    Map<String, Object> prefs = const {},
     GasRecord? existing,
   }) async {
-    SharedPreferences.setMockInitialValues(prefs);
     final adapter = _CapturingAdapter();
     final dio = Dio(BaseOptions(baseUrl: 'http://server'))
       ..httpClientAdapter = adapter;
-    final scope = ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(
-          await SharedPreferences.getInstance(),
-        ),
-        vehiclesRepositoryProvider.overrideWithValue(VehiclesRepository(dio)),
-        vehicleUnitsProvider.overrideWith((ref, id) => units),
-        extraFieldTemplatesProvider.overrideWith((ref) async => null),
-      ],
-      child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Builder(
-          builder: (context) => Scaffold(
-            body: Center(
-              child: ElevatedButton(
-                onPressed: () =>
-                    showAddFuelForm(context, vehicleId, existing: existing),
-                child: const Text('open'),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          vehiclesRepositoryProvider.overrideWithValue(VehiclesRepository(dio)),
+          vehicleUnitsProvider.overrideWith((ref, id) => units),
+          extraFieldTemplatesProvider.overrideWith((ref) async => null),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () =>
+                      showAddFuelForm(context, vehicleId, existing: existing),
+                  child: const Text('open'),
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
-    await tester.pumpWidget(scope);
-    container = ProviderScope.containerOf(
-      tester.element(find.byType(ElevatedButton)),
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
@@ -106,12 +96,6 @@ void main() {
     await tester.pump();
   }
 
-  Future<void> pickMode(WidgetTester tester, String label) async {
-    await tester.ensureVisible(find.text(label));
-    await tester.tap(find.text(label));
-    await tester.pumpAndSettle();
-  }
-
   Future<void> save(WidgetTester tester, {String? label}) async {
     final button = find.widgetWithText(FilledButton, label ?? en.actionAdd);
     await tester.ensureVisible(button);
@@ -124,44 +108,42 @@ void main() {
     (adapter.captured!.data as Map<String, dynamic>)[key] as String,
   );
 
+  bool enabled(WidgetTester tester, String label) =>
+      tester.widget<TextFormField>(field(label)).enabled;
+
   Future<void> typeOdometer(WidgetTester tester) =>
       type(tester, en.formOdometerLabel(units.distanceLabel), '1000');
 
-  testWidgets('the default mode has no price field and sends what was typed', (
-    tester,
-  ) async {
+  testWidgets('amount and cost give the price', (tester) async {
     final adapter = await pump(tester);
-    expect(field(price), findsNothing);
-
     await typeOdometer(tester);
     await type(tester, fuel, '12.5');
+    expect(text(tester, price), isEmpty, reason: 'one value is not enough');
+    expect([price, cost].map((l) => enabled(tester, l)), [true, true]);
     await type(tester, cost, '50');
-    await save(tester);
 
+    expect(text(tester, price), '4');
+    expect(enabled(tester, price), isFalse);
+    expect([fuel, cost].map((l) => enabled(tester, l)), [true, true]);
+    await save(tester);
     expect(sent(adapter, 'fuelConsumed'), 12.5);
     expect(sent(adapter, 'cost'), 50);
   });
 
-  testWidgets('price and cost calculate the fuel amount', (tester) async {
+  testWidgets('price and cost give the amount', (tester) async {
     final adapter = await pump(tester);
-    await pickMode(tester, en.formEntryModePriceCost);
-
     await typeOdometer(tester);
     await type(tester, price, '3.459');
     await type(tester, cost, '40');
 
     expect(text(tester, fuel), '11.564');
-    expect(tester.widget<TextFormField>(field(fuel)).enabled, isFalse);
-
     await save(tester);
     expect(sent(adapter, 'fuelConsumed'), 11.564);
     expect(sent(adapter, 'cost'), 40);
   });
 
-  testWidgets('price and amount calculate the total cost', (tester) async {
+  testWidgets('price and amount give the total cost', (tester) async {
     final adapter = await pump(tester);
-    await pickMode(tester, en.formEntryModePriceAmount);
-
     await typeOdometer(tester);
     await type(tester, price, '3.459');
     await type(tester, fuel, '11.5');
@@ -172,20 +154,67 @@ void main() {
     expect(sent(adapter, 'fuelConsumed'), 11.5);
   });
 
-  testWidgets('a zero total in price and cost mode blocks the save', (
+  testWidgets('the calculated value follows every keystroke', (tester) async {
+    await pump(tester);
+    await type(tester, price, '2');
+    await type(tester, fuel, '1');
+    expect(text(tester, cost), '2');
+    await type(tester, fuel, '10');
+    expect(text(tester, cost), '20');
+  });
+
+  testWidgets('correcting an input recalculates the same field', (
     tester,
   ) async {
-    final adapter = await pump(tester);
-    await pickMode(tester, en.formEntryModePriceCost);
+    await pump(tester);
+    await type(tester, fuel, '12.5');
+    await type(tester, cost, '50');
+    expect(text(tester, price), '4');
 
+    await type(tester, cost, '60');
+    expect(text(tester, price), '4.8');
+    await type(tester, fuel, '10');
+    expect(text(tester, price), '6');
+    expect(text(tester, cost), '60');
+  });
+
+  testWidgets('emptying an input frees the calculated field', (tester) async {
+    await pump(tester);
+    await type(tester, price, '3');
+    await type(tester, fuel, '10');
+    expect(text(tester, cost), '30');
+    expect(enabled(tester, cost), isFalse);
+
+    await type(tester, price, '');
+    expect(text(tester, cost), isEmpty);
+    expect(enabled(tester, cost), isTrue);
+    expect(text(tester, fuel), '10');
+
+    // The freed field can take the place of the emptied one.
+    await type(tester, cost, '50');
+    expect(text(tester, price), '5');
+    expect(enabled(tester, price), isFalse);
+  });
+
+  testWidgets('a free fill-up is a price of zero', (tester) async {
+    final adapter = await pump(tester);
+    await typeOdometer(tester);
+    await type(tester, price, '0');
+    await type(tester, fuel, '10');
+    await save(tester);
+
+    expect(sent(adapter, 'cost'), 0);
+  });
+
+  testWidgets('a total of zero with a price blocks the save', (tester) async {
+    final adapter = await pump(tester);
     await typeOdometer(tester);
     await type(tester, price, '3');
     await type(tester, cost, '0');
     await save(tester);
 
+    // No amount can come out of a zero total.
     expect(adapter.captured, isNull);
-    // The typed total is the one that is wrong; the empty amount only follows.
-    expect(find.text(en.validationNumber), findsOneWidget);
     expect(find.text(en.validationRequired), findsOneWidget);
   });
 
@@ -193,8 +222,6 @@ void main() {
     tester,
   ) async {
     final adapter = await pump(tester);
-    await pickMode(tester, en.formEntryModePriceCost);
-
     await typeOdometer(tester);
     await type(tester, price, '1000');
     await type(tester, cost, '0.0001');
@@ -202,45 +229,14 @@ void main() {
     await save(tester);
 
     expect(adapter.captured, isNull);
-    // Both typed values are valid; the error is on the calculated field.
     expect(find.text(en.validationNumber), findsOneWidget);
   });
 
-  testWidgets('switching modes keeps what was typed and is remembered', (
-    tester,
-  ) async {
-    await pump(tester);
-    await type(tester, fuel, '12.5');
-    await type(tester, cost, '50');
-
-    await pickMode(tester, en.formEntryModePriceAmount);
-    expect(text(tester, fuel), '12.5');
-    expect(text(tester, price), '4', reason: 'the price it was calculated as');
-    expect(text(tester, cost), '50', reason: '4 * 12.5');
-    expect(container.read(fuelEntryModeProvider), FuelEntryMode.priceAndFuel);
-  });
-
-  testWidgets('the form opens on the remembered mode', (tester) async {
-    await pump(tester, prefs: {'fuel_entry_mode': 'priceAndCost'});
-    expect(field(price), findsOneWidget);
-    expect(
-      tester
-          .widget<SegmentedButton<FuelEntryMode>>(
-            find.byType(SegmentedButton<FuelEntryMode>),
-          )
-          .selected,
-      {FuelEntryMode.priceAndCost},
-    );
-  });
-
-  testWidgets('an untouched record is saved as stored, whatever the mode', (
-    tester,
-  ) async {
-    // 25 / 7.777 rounds to a price of 3.215, which gives 7.776 back: opening
-    // the record in the remembered mode would have rewritten the fuel.
+  testWidgets('an untouched record is saved as stored', (tester) async {
+    // 25 / 7.777 rounds to a price of 3.215, which would give 7.776 back: the
+    // stored pair must not be recalculated from the price.
     final adapter = await pump(
       tester,
-      prefs: {'fuel_entry_mode': 'priceAndCost'},
       existing: GasRecord(
         id: 7,
         date: DateTime(2026, 4, 5),
@@ -252,8 +248,8 @@ void main() {
       ),
     );
 
-    expect(text(tester, fuel), '7.777');
-    expect(text(tester, cost), '25');
+    expect(text(tester, price), '3.215');
+    expect(enabled(tester, price), isFalse);
     await save(tester, label: en.actionSave);
     expect(sent(adapter, 'fuelConsumed'), 7.777);
     expect(sent(adapter, 'cost'), 25);
