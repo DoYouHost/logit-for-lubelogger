@@ -260,6 +260,8 @@
       "unit": { "type": "String" }
     }
   },
+  "formFuelPriceLabel": "Cena paliwa (za {unit})",
+  "formEnergyPriceLabel": "Cena energii (za {unit})",
   "formFillToFull": "Do pełna",
   "formMissedFuelUp": "Pominięte tankowanie (bez spalania)",
   "formTagsOptional": "Tagi (opcjonalnie)",

@@ -1208,6 +1208,18 @@ abstract class AppLocalizations {
   /// **'Fuel consumed ({unit})'**
   String formFuelLabel(String unit);
 
+  /// No description provided for @formFuelPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel price (per {unit})'**
+  String formFuelPriceLabel(String unit);
+
+  /// Charging-session price field; unit is kWh
+  ///
+  /// In en, this message translates to:
+  /// **'Energy price (per {unit})'**
+  String formEnergyPriceLabel(String unit);
+
   /// No description provided for @formFillToFull.
   ///
   /// In en, this message translates to:
