@@ -2,7 +2,7 @@ name: lubelogger_mobile
 description: "Native Android app for LubeLogger — a self-hosted vehicle maintenance manager."
 publish_to: 'none'
 
-version: 0.4.3+403000
+version: 0.4.4+404000
 
 environment:
   sdk: ^3.12.2
