@@ -41,7 +41,7 @@ The tool scripts that used to be copied into `tool/` (`aab_versions.py`,
 - **One package must resolve from one ref.** A package that two others name at
   different refs fails version solving, so `app_report_client` must be the ref
   `app_diagnostics` names for its own copy, and `app_diagnostics`, `app_report_ui`,
-  `dash_kit`, `app_util` and `app_guards` move together (all `v0.12.2` at the time
+  `dash_kit`, `app_util` and `app_guards` move together (all `v0.13.1` at the time
   of writing; `app_report_client` stays at its own tag). Bump all of them in one
   commit, after the tag exists upstream.
 - **While a tag does not exist yet**, resolve through a local
