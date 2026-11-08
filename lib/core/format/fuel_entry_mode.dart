@@ -8,7 +8,14 @@ enum FuelEntryMode {
   priceAndCost,
 
   /// Price and fuel amount typed, total cost calculated.
-  priceAndFuel,
+  priceAndFuel;
+
+  static FuelEntryMode? byName(String name) {
+    for (final mode in values) {
+      if (mode.name == name) return mode;
+    }
+    return null;
+  }
 }
 
 /// Half-up rounding. The nudge keeps ties like 2.01 * 0.5 = 1.005, which

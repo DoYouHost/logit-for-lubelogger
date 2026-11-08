@@ -215,6 +215,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can switch each chart on the vehicle dashboard separately.';
 
   @override
+  String get settingsFuelForm => 'Fuel-ups';
+
+  @override
+  String get settingsFuelCalculated => 'Calculated field';
+
+  @override
+  String get settingsFuelFormNote =>
+      'A new fuel-up asks for the other two values first and calculates this one. To enter a different pair once, empty one of the fields.';
+
+  @override
+  String get fuelCalculatedPrice => 'Price';
+
+  @override
+  String get fuelCalculatedAmount => 'Amount';
+
+  @override
+  String get fuelCalculatedCost => 'Total cost';
+
+  @override
   String get legendExpenses => 'Expenses';
 
   @override

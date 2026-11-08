@@ -217,6 +217,25 @@ class AppLocalizationsPl extends AppLocalizations {
       'Każdy wykres na pulpicie pojazdu możesz przełączyć osobno.';
 
   @override
+  String get settingsFuelForm => 'Tankowania';
+
+  @override
+  String get settingsFuelCalculated => 'Pole wyliczane';
+
+  @override
+  String get settingsFuelFormNote =>
+      'Nowe tankowanie najpierw pyta o dwie pozostałe wartości, a tę wylicza samo. Żeby raz wpisać inną parę, wyczyść jedno z pól.';
+
+  @override
+  String get fuelCalculatedPrice => 'Cena';
+
+  @override
+  String get fuelCalculatedAmount => 'Ilość';
+
+  @override
+  String get fuelCalculatedCost => 'Koszt całkowity';
+
+  @override
   String get legendExpenses => 'Wydatki';
 
   @override

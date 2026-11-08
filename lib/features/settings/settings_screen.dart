@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/format/chart_range.dart';
+import '../../core/format/fuel_entry_mode.dart';
 import '../../core/layout/responsive.dart';
 import '../../core/settings/units_settings.dart';
 import '../../core/theme/dash_theme.dart';
@@ -179,6 +180,29 @@ class SettingsScreen extends ConsumerWidget {
                       onChanged: ref
                           .read(chartDefaultRangeProvider.notifier)
                           .set,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: DashSpace.lg),
+              _Section(
+                id: 'fuel',
+                title: l10n.settingsFuelForm,
+                footnote: l10n.settingsFuelFormNote,
+                children: [
+                  _SettingRow(
+                    label: l10n.settingsFuelCalculated,
+                    // Named after the typed pair, shown as the calculated one.
+                    control: _Dropdown<FuelEntryMode>(
+                      id: 'settings.fuelCalculated',
+                      value: ref.watch(fuelEntryModeProvider),
+                      items: FuelEntryMode.values,
+                      labelOf: (m) => switch (m) {
+                        FuelEntryMode.costAndFuel => l10n.fuelCalculatedPrice,
+                        FuelEntryMode.priceAndCost => l10n.fuelCalculatedAmount,
+                        FuelEntryMode.priceAndFuel => l10n.fuelCalculatedCost,
+                      },
+                      onChanged: ref.read(fuelEntryModeProvider.notifier).set,
                     ),
                   ),
                 ],
@@ -794,29 +818,37 @@ class _Dropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = DashTokens.of(context);
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<T>(
-        value: value,
-        borderRadius: BorderRadius.circular(14),
-        dropdownColor: t.overlaySurface,
-        style: TextStyle(
-          fontFamily: DashTokens.fontUi,
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: t.textPrimary,
-        ),
-        icon: Icon(Icons.arrow_drop_down, color: t.textSecondary),
-        items: [
-          for (final item in items)
-            DropdownMenuItem(
-              value: item,
-              child: logTag('$id.option', Text(labelOf(item))),
-            ),
-        ],
-        onChanged: (v) {
-          if (v != null) onChanged(v);
-        },
-      ).tagged(id),
+    // As wide as its longest option, like a plain DropdownButton, but no wider
+    // than the row: at large text sizes the option wraps instead of running off
+    // the screen edge. isExpanded lets it wrap, and itemHeight: null lets the
+    // button grow to show the second line (the default clips it at 48).
+    return IntrinsicWidth(
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          isExpanded: true,
+          itemHeight: null,
+          value: value,
+          borderRadius: BorderRadius.circular(14),
+          dropdownColor: t.overlaySurface,
+          style: TextStyle(
+            fontFamily: DashTokens.fontUi,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: t.textPrimary,
+          ),
+          icon: Icon(Icons.arrow_drop_down, color: t.textSecondary),
+          items: [
+            for (final item in items)
+              DropdownMenuItem(
+                value: item,
+                child: logTag('$id.option', Text(labelOf(item))),
+              ),
+          ],
+          onChanged: (v) {
+            if (v != null) onChanged(v);
+          },
+        ).tagged(id),
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -104,7 +105,11 @@ void main() {
         final oneLine = tester.getSize(find.text(l10n.settingsDistance)).height;
 
         expect(tester.takeException(), isNull);
-        for (final label in [l10n.settingsStorageBase, l10n.settingsCurrency]) {
+        for (final label in [
+          l10n.settingsStorageBase,
+          l10n.settingsCurrency,
+          l10n.settingsFuelCalculated,
+        ]) {
           expect(
             tester.getSize(find.text(label)).height,
             oneLine,
@@ -113,6 +118,35 @@ void main() {
         }
       },
     );
+  }
+
+  // Android's largest font sizes: the longest option wraps onto a second line,
+  // which must neither overflow the screen edge nor be clipped by the button.
+  for (final locale in AppLocalizations.supportedLocales) {
+    for (final scale in [1.5, 2.0]) {
+      testWidgets('the UK MPG option is shown whole at ${scale}x text in '
+          '${locale.languageCode}', (tester) async {
+        await pumpSettings(
+          tester,
+          locale: locale,
+          base: MeasurementSystem.imperialUk,
+          textScale: scale,
+        );
+        final l10n = await AppLocalizations.delegate.load(locale);
+
+        expect(tester.takeException(), isNull);
+        final option = tester.renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.byType(DropdownButton<MeasurementSystem>),
+            matching: find.text(l10n.baseImperialUk),
+          ),
+        );
+        expect(
+          option.size.height,
+          greaterThanOrEqualTo(option.textSize.height),
+        );
+      });
+    }
   }
 
   // 360 dp is the common phone width: the row label must not be squeezed onto
@@ -149,5 +183,19 @@ void main() {
     final stored = jsonDecode(prefs.getString('units_settings')!);
     expect(stored['base'], 'imperialUk');
     expect(find.text(l10n.baseImperialUk), findsOneWidget);
+  });
+
+  testWidgets('picking the calculated fuel field persists it', (tester) async {
+    const locale = Locale('en');
+    await pumpSettings(tester, locale: locale, base: MeasurementSystem.metric);
+    final l10n = await AppLocalizations.delegate.load(locale);
+
+    await tester.tap(find.text(l10n.fuelCalculatedPrice));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.fuelCalculatedAmount).last);
+    await tester.pumpAndSettle();
+
+    expect(prefs.getString('fuel_entry_mode'), 'priceAndCost');
+    expect(find.text(l10n.fuelCalculatedAmount), findsOneWidget);
   });
 }
