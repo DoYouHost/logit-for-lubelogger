@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_diagnostics/app_diagnostics.dart';
 
 import '../../../core/api/api_exceptions.dart';
+import '../../../core/format/fuel_entry_mode.dart';
+import '../../../core/format/vehicle_units.dart';
 import '../../../core/models/attachment.dart';
 import '../../../core/models/extra_field.dart';
 import '../../../core/models/gas_record.dart';
@@ -48,6 +50,7 @@ class _AddFuelForm extends ConsumerStatefulWidget {
 class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
   final _formKey = GlobalKey<FormState>();
   final _odometer = TextEditingController();
+  final _price = TextEditingController();
   final _fuel = TextEditingController();
   final _cost = TextEditingController();
   final _tags = TextEditingController();
@@ -62,6 +65,16 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
   bool _submitting = false;
   String? _error;
 
+  /// The two of price, fuel and cost the third is calculated from: the
+  /// Settings pair on a new record, the stored pair on an existing one. Always
+  /// two: typing into the third while one of them is empty swaps that one out,
+  /// for this record only.
+  final List<TextEditingController> _typed = [];
+
+  /// Price, fuel and cost in display order: the pair first, so the keyboard's
+  /// next key walks straight through it, and the calculated field last.
+  late final List<TextEditingController> _order;
+
   bool get _isEditing => widget.existing != null;
 
   @override
@@ -75,6 +88,16 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
       (e?.startingSoc ?? GasRecord.defaultStartingSoc).toDouble(),
       (e?.endingSoc ?? GasRecord.defaultEndingSoc).toDouble(),
     );
+    // An existing record calculates the price whatever Settings say, so its
+    // stored fuel and cost are saved back unchanged.
+    _order = switch (e == null
+        ? ref.read(fuelEntryModeProvider)
+        : FuelEntryMode.costAndFuel) {
+      FuelEntryMode.costAndFuel => [_fuel, _cost, _price],
+      FuelEntryMode.priceAndCost => [_price, _cost, _fuel],
+      FuelEntryMode.priceAndFuel => [_price, _fuel, _cost],
+    };
+    _typed.addAll(_order.take(2));
     if (e != null) {
       _odometer.text = formatFormNumber(
         ref
@@ -87,12 +110,50 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
       _notes.text = e.notes;
       _files = [...e.files];
       _extraFields = e.extraFields;
+      _recompute();
     }
+  }
+
+  TextEditingController get _calculated =>
+      [_price, _fuel, _cost].firstWhere((c) => !_typed.contains(c));
+
+  bool _isEmpty(TextEditingController c) => c.text.trim().isEmpty;
+
+  /// The calculated field is greyed out only once both inputs have a value, so
+  /// a pair whose input is empty can be swapped by typing into the third.
+  TextEditingController? get _locked =>
+      _typed.any(_isEmpty) ? null : _calculated;
+
+  /// A field the user edited by hand (a calculated write does not call this).
+  void _typedIn(TextEditingController field) {
+    // The third takes input only while unlocked, so one of the pair is empty.
+    final empty = _typed.indexWhere(_isEmpty);
+    if (!_isEmpty(field) && !_typed.contains(field) && empty >= 0) {
+      _typed[empty] = field;
+    }
+    setState(_recompute);
+  }
+
+  /// Also empties the calculated field while an input is missing.
+  void _recompute() {
+    final target = _calculated;
+    final value = deriveFuelEntry(
+      target == _price
+          ? FuelEntryMode.costAndFuel
+          : target == _fuel
+          ? FuelEntryMode.priceAndCost
+          : FuelEntryMode.priceAndFuel,
+      price: parseUserDecimal(_price.text),
+      cost: parseUserDecimal(_cost.text),
+      fuel: parseUserDecimal(_fuel.text),
+    );
+    target.text = value == null ? '' : formatFormNumber(value);
   }
 
   @override
   void dispose() {
     _odometer.dispose();
+    _price.dispose();
     _fuel.dispose();
     _cost.dispose();
     _tags.dispose();
@@ -159,13 +220,10 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
                 label: l10n.formOdometerLabel(units.distanceLabel),
                 decimal: false,
               ),
-              const SizedBox(height: DashSpace.lg),
-              _numberField(
-                controller: _fuel,
-                label: units.isElectric
-                    ? l10n.formEnergyLabel(units.consumptionLabel)
-                    : l10n.formFuelLabel(units.consumptionLabel),
-              ),
+              for (final field in _order) ...[
+                const SizedBox(height: DashSpace.lg),
+                _linkedField(field, units, l10n),
+              ],
               // Electric only, like the web's dual-range slider: the server
               // reads state of charge for no other kind of vehicle.
               if (units.isElectric) ...[
@@ -194,12 +252,6 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
                 onChanged: _submitting
                     ? null
                     : (v) => setState(() => _missedFuelUp = v ?? false),
-              ),
-              const SizedBox(height: DashSpace.sm),
-              _numberField(
-                controller: _cost,
-                label: l10n.colCost,
-                allowZero: true,
               ),
               const SizedBox(height: DashSpace.lg),
               TextFormField(
@@ -277,26 +329,68 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
     );
   }
 
+  Widget _linkedField(
+    TextEditingController field,
+    VehicleUnits units,
+    AppLocalizations l10n,
+  ) {
+    if (field == _price) {
+      return _numberField(
+        controller: _price,
+        label: units.isElectric
+            ? l10n.formEnergyPriceLabel(units.consumptionLabel)
+            : l10n.formFuelPriceLabel(units.consumptionLabel),
+        allowZero: true,
+        // Not stored, so it is required only while the calculation reads it.
+        optional: !_typed.contains(_price),
+        linked: true,
+      );
+    }
+    if (field == _fuel) {
+      return _numberField(
+        controller: _fuel,
+        label: units.isElectric
+            ? l10n.formEnergyLabel(units.consumptionLabel)
+            : l10n.formFuelLabel(units.consumptionLabel),
+        linked: true,
+      );
+    }
+    return _numberField(
+      controller: _cost,
+      label: l10n.colCost,
+      allowZero: true,
+      linked: true,
+    );
+  }
+
   Widget _numberField({
     required TextEditingController controller,
     required String label,
     bool decimal = true,
     bool allowZero = false,
+    bool optional = false,
+    bool linked = false,
   }) {
     final l10n = AppLocalizations.of(context);
     final t = DashTokens.of(context);
     return TextFormField(
       controller: controller,
-      enabled: !_submitting,
+      // The calculated field is greyed out; a disabled field still validates,
+      // which matters when its value comes out as zero.
+      enabled: !_submitting && controller != _locked,
       keyboardType: numberKeyboard(decimal: decimal),
+      // A disabled field cannot take focus, so next skips the calculated one.
+      textInputAction: TextInputAction.next,
       inputFormatters: decimal
           ? decimalInputFormatters
           : integerInputFormatters,
       style: const TextStyle(fontFamily: DashTokens.fontMono),
       decoration: dashFieldDecoration(t, labelText: label),
+      onChanged: linked ? (_) => _typedIn(controller) : null,
       validator: (raw) {
         final value = parseUserDecimal(raw);
         if (value == null) {
+          if (optional && (raw == null || raw.trim().isEmpty)) return null;
           return (raw == null || raw.trim().isEmpty)
               ? l10n.validationRequired
               : l10n.validationNumber;

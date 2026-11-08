@@ -476,6 +476,42 @@ abstract class AppLocalizations {
   /// **'You can switch each chart on the vehicle dashboard separately.'**
   String get settingsChartsNote;
 
+  /// No description provided for @settingsFuelForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel-ups'**
+  String get settingsFuelForm;
+
+  /// No description provided for @settingsFuelCalculated.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated field'**
+  String get settingsFuelCalculated;
+
+  /// No description provided for @settingsFuelFormNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A new fuel-up asks for the other two values first and calculates this one. To enter a different pair once, empty one of the fields.'**
+  String get settingsFuelFormNote;
+
+  /// No description provided for @fuelCalculatedPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get fuelCalculatedPrice;
+
+  /// No description provided for @fuelCalculatedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get fuelCalculatedAmount;
+
+  /// No description provided for @fuelCalculatedCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Total cost'**
+  String get fuelCalculatedCost;
+
   /// No description provided for @legendExpenses.
   ///
   /// In en, this message translates to:
@@ -1207,6 +1243,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fuel consumed ({unit})'**
   String formFuelLabel(String unit);
+
+  /// No description provided for @formFuelPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel price (per {unit})'**
+  String formFuelPriceLabel(String unit);
+
+  /// Charging-session price field; unit is kWh
+  ///
+  /// In en, this message translates to:
+  /// **'Energy price (per {unit})'**
+  String formEnergyPriceLabel(String unit);
 
   /// No description provided for @formFillToFull.
   ///

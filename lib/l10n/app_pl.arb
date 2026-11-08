@@ -68,6 +68,12 @@
   "settingsCharts": "Wykresy",
   "settingsChartDefaultRange": "Domyślny zakres wykresów",
   "settingsChartsNote": "Każdy wykres na pulpicie pojazdu możesz przełączyć osobno.",
+  "settingsFuelForm": "Tankowania",
+  "settingsFuelCalculated": "Pole wyliczane",
+  "settingsFuelFormNote": "Nowe tankowanie najpierw pyta o dwie pozostałe wartości, a tę wylicza samo. Żeby raz wpisać inną parę, wyczyść jedno z pól.",
+  "fuelCalculatedPrice": "Cena",
+  "fuelCalculatedAmount": "Ilość",
+  "fuelCalculatedCost": "Koszt całkowity",
   "chartNoReminders": "Brak przypomnień",
   "legendExpenses": "Wydatki",
   "legendDistance": "Dystans",
@@ -260,6 +266,8 @@
       "unit": { "type": "String" }
     }
   },
+  "formFuelPriceLabel": "Cena paliwa (za {unit})",
+  "formEnergyPriceLabel": "Cena energii (za {unit})",
   "formFillToFull": "Do pełna",
   "formMissedFuelUp": "Pominięte tankowanie (bez spalania)",
   "formTagsOptional": "Tagi (opcjonalnie)",

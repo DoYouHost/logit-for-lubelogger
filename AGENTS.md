@@ -37,9 +37,11 @@ flutter test          # or: just test
 
 A question about the server's contract is answered by the server source
 ([hargata/lubelog](https://github.com/hargata/lubelog)), not by the user: cite the
-file and line. The GitHub Action has it checked out at `/tmp/lubelog-server-ref`;
-locally make a read-only clone outside the repository and never create a copy
-inside it (`reference/` is git-excluded).
+file and line. In the maintainer's own checkout the clone lives at
+`reference/lubelog` (git-excluded); the GitHub Action has it at
+`/tmp/lubelog-server-ref`. Where it is missing — a cloud session starts from a
+fresh clone — make a read-only copy outside the repository; never create a second
+copy of it inside the repository.
 
 ## Stop and ask: compatibility
 
