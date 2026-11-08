@@ -104,6 +104,12 @@
   "settingsCharts": "Charts",
   "settingsChartDefaultRange": "Default chart range",
   "settingsChartsNote": "You can switch each chart on the vehicle dashboard separately.",
+  "settingsFuelForm": "Fuel-ups",
+  "settingsFuelCalculated": "Calculated field",
+  "settingsFuelFormNote": "A new fuel-up asks for the other two values first and calculates this one. To enter a different pair once, empty one of the fields.",
+  "fuelCalculatedPrice": "Price",
+  "fuelCalculatedAmount": "Amount",
+  "fuelCalculatedCost": "Total cost",
   "legendExpenses": "Expenses",
   "legendDistance": "Distance",
 
