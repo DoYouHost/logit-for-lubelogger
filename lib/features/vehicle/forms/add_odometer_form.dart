@@ -1,5 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../../core/diagnostics/log_form.dart';
 import '../../common/confirm_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,15 +95,14 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
     final t = DashTokens.of(context);
     final units = ref.watch(vehicleUnitsProvider(widget.vehicleId));
     final previous = _previousReading(
-      ref.watch(odometerRecordsProvider(widget.vehicleId)).valueOrNull ??
-          const [],
+      ref.watch(odometerRecordsProvider(widget.vehicleId)).value ?? const [],
       // Only an added reading can fall back to it, so an edit does not even
       // ask — watching it would fetch the vehicle for a value it discards.
       _isEditing
           ? null
           : ref
                 .watch(vehicleInfoProvider(widget.vehicleId))
-                .valueOrNull
+                .value
                 ?.lastReportedOdometer,
     );
     final previousText = previous == null
@@ -147,10 +146,16 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
                   ),
                   if (_isEditing)
                     IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).deleteButtonTooltip,
                       icon: Icon(Icons.delete_outline, color: t.dangerInk),
                       onPressed: _submitting ? null : _confirmDelete,
                     ).tagged('form.delete'),
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     icon: const Icon(Icons.close),
                     onPressed: _submitting
                         ? null
@@ -303,12 +308,12 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
   /// [_previousReading]'s inputs, read rather than watched — for the submit
   /// path, which runs outside a build.
   double? _previousReadingNow() => _previousReading(
-    ref.read(odometerRecordsProvider(widget.vehicleId)).valueOrNull ?? const [],
+    ref.read(odometerRecordsProvider(widget.vehicleId)).value ?? const [],
     _isEditing
         ? null
         : ref
               .read(vehicleInfoProvider(widget.vehicleId))
-              .valueOrNull
+              .value
               ?.lastReportedOdometer,
   );
 

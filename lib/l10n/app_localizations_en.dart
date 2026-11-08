@@ -35,6 +35,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get apiKeyLabel => 'API key';
 
   @override
+  String get apiKeyShow => 'Show the key';
+
+  @override
+  String get apiKeyHide => 'Hide the key';
+
+  @override
   String get connect => 'Connect';
 
   @override

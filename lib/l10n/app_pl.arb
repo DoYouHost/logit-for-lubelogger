@@ -10,6 +10,8 @@
 
   "apiKeyExplain": "Wygeneruj klucz API w LubeLogger w Ustawieniach. Zalecane: bez wygasania, z ograniczonym zakresem.",
   "apiKeyLabel": "Klucz API",
+  "apiKeyShow": "Pokaż klucz",
+  "apiKeyHide": "Ukryj klucz",
 
   "connect": "Połącz",
   "connecting": "Łączenie…",

@@ -146,6 +146,18 @@ abstract class AppLocalizations {
   /// **'API key'**
   String get apiKeyLabel;
 
+  /// No description provided for @apiKeyShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the key'**
+  String get apiKeyShow;
+
+  /// No description provided for @apiKeyHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the key'**
+  String get apiKeyHide;
+
   /// No description provided for @connect.
   ///
   /// In en, this message translates to:

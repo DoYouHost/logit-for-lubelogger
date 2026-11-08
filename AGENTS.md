@@ -108,6 +108,9 @@ inside an unrelated change and do not stay silent.
 - [docs/diagnostics.md](docs/diagnostics.md) — the bug-report log, the relay
   contract and the redaction rules that are easy to break. **Read it before adding a
   log field, a control or a report path.**
+- [docs/a11y-guideline-tests.md](docs/a11y-guideline-tests.md) — the rendered accessibility
+  suite (`just test-a11y`): what it covers, what it does not and why, how the harness
+  measures. **Read it before touching `test/a11y/` or fixing a guideline finding.**
 - [docs/performance.md](docs/performance.md) — measuring before claiming, and the
   scroll benchmark harness.
 - [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `main`:
@@ -150,6 +153,16 @@ inside an unrelated change and do not stay silent.
 - **Release only through `just ship` / `just ship-dev`**, a stable one from
   `release/X.Y.Z` cut by `just release-start` ([docs/branching.md](docs/branching.md)).
   Never push a tag by hand and never change `applicationId`.
+- **UI and state packages:** screens import `package:material_ui/material_ui.dart`,
+  never `flutter/material.dart` (the shared design system returns its types), and
+  Material's localizations come from `GlobalMaterialLocalizations.delegates`, never
+  from the generated `AppLocalizations.localizationsDelegates` (a `material_ui`
+  widget finds no `MaterialLocalizations` from it, and nothing says so until
+  runtime). `flutter_riverpod` is at 3: `value` not `valueOrNull`, one `Notifier` base
+  with `.autoDispose` on the provider, `Override` and `ProviderOrFamily` from
+  `flutter_riverpod/misc.dart`, and `neverRetry` (in `providers.dart`) passed to every
+  root `ProviderScope` and container in `lib/`, and to any test that reads a provider
+  it expects to fail (a retry holds it on `AsyncLoading`).
 - **Bump every `app-shared` ref together**; `app_report_client` must match the ref
   `app_diagnostics` names ([docs/shared-packages.md](docs/shared-packages.md)).
 - **Diagnostics:** `relayBaseUrl` must not end in a slash; every new log field with

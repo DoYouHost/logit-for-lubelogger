@@ -36,6 +36,16 @@ default:
 test:
     flutter test
 
+# Every screen of the app on the demo server, in both themes and at 150 / 200 %
+# text, held to Flutter's contrast, tap-target and label guidelines. One run with
+# the parallelism inside it: several `flutter test` processes share build/test_cache
+# and corrupt it. See docs/a11y-guideline-tests.md.
+# usage: just test-a11y [FILES…]
+[doc('run the rendered accessibility suite')]
+[group('1-develop')]
+test-a11y *files='test/a11y':
+    systemd-run --user --scope -q -p MemoryMax=12G -p MemorySwapMax=0 -p RuntimeMaxSec=1800 flutter test --concurrency=4 {{files}}
+
 # Compare .arb files against the English template: find missing, outdated or mismatched keys.
 # usage: just l10n-status [*ARGS]
 [doc('check translation status and missing keys against app_en.arb')]

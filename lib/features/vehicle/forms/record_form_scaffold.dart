@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/diagnostics/log_form.dart';
 import '../../../core/theme/dash_theme.dart';
@@ -87,10 +87,16 @@ class RecordFormScaffold extends StatelessWidget {
                   // as the form's own surface (`form.fuel`, `form.note`, …).
                   if (isEditing && onDelete != null)
                     IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).deleteButtonTooltip,
                       icon: Icon(Icons.delete_outline, color: t.dangerInk),
                       onPressed: submitting ? null : onDelete,
                     ).tagged('form.delete'),
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     icon: const Icon(Icons.close),
                     onPressed: submitting ? null : onCancel,
                   ).tagged('form.close'),

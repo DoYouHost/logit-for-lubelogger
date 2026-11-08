@@ -1,5 +1,5 @@
 import 'package:dash_kit/dash_kit.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 export 'package:dash_kit/dash_kit.dart';
 

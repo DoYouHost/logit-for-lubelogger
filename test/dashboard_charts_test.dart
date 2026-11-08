@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lubelogger_mobile/core/format/chart_range.dart';
 import 'package:lubelogger_mobile/core/format/expense_timeline.dart';
@@ -14,7 +14,10 @@ void main() {
   Future<void> pump(WidgetTester tester, Widget chart) async {
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
+        ],
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: SingleChildScrollView(child: chart)),
       ),
@@ -292,7 +295,10 @@ void main() {
       late Future<ChartRange?> result;
       await tester.pumpWidget(
         MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
           supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
             builder: (context) => TextButton(

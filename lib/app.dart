@@ -1,5 +1,5 @@
 import 'package:app_report_ui/app_report_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/dash_theme.dart';
@@ -21,7 +21,8 @@ class LubeLoggerApp extends ConsumerWidget {
       themeMode: ThemeMode.system,
       // Locale auto-detected from the system; en is the fallback.
       localizationsDelegates: [
-        ...AppLocalizations.localizationsDelegates,
+        AppLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
         ReportLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,

@@ -1,7 +1,7 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:app_report_ui/app_report_ui.dart' show bugReportRoute;
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,13 +34,13 @@ class SettingsScreen extends ConsumerWidget {
     final remindersCtl = ref.read(reminderNotificationsProvider.notifier);
     final backgroundRefresh = ref.watch(backgroundRefreshProvider);
     final chartRange = ref.watch(chartDefaultRangeProvider);
-    final cacheBytes = ref.watch(cacheSizeProvider).valueOrNull;
+    final cacheBytes = ref.watch(cacheSizeProvider).value;
     final serverSymbol =
-        ref.watch(serverInfoProvider).valueOrNull?.currencySymbol ?? r'$';
+        ref.watch(serverInfoProvider).value?.currencySymbol ?? r'$';
     final profile = ref.watch(serverProfileProvider);
-    final packageInfo = ref.watch(packageInfoProvider).valueOrNull;
-    final who = ref.watch(whoAmIProvider).valueOrNull;
-    final serverVersion = ref.watch(serverVersionProvider).valueOrNull;
+    final packageInfo = ref.watch(packageInfoProvider).value;
+    final who = ref.watch(whoAmIProvider).value;
+    final serverVersion = ref.watch(serverVersionProvider).value;
 
     return DashBackground(
       child: Scaffold(
@@ -64,6 +64,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsStorageBase,
                     control: _Dropdown<MeasurementSystem>(
+                      label: l10n.settingsStorageBase,
                       id: 'settings.storageBase',
                       value: units.base,
                       items: MeasurementSystem.values,
@@ -79,6 +80,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsCurrency,
                     control: _Dropdown<CurrencyOption>(
+                      label: l10n.settingsCurrency,
                       id: 'settings.currency',
                       value: units.currency,
                       items: CurrencyOption.values,
@@ -105,6 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsFuelEconomy,
                     control: _Dropdown<FuelEconomyUnit>(
+                      label: l10n.settingsFuelEconomy,
                       id: 'settings.fuelEconomy',
                       value: units.economy,
                       items: FuelEconomyUnit.values,
@@ -116,6 +119,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsDateFormat,
                     control: _Dropdown<DateOrder>(
+                      label: l10n.settingsDateFormat,
                       id: 'settings.dateFormat',
                       value: units.dateOrder,
                       items: DateOrder.values,
@@ -127,6 +131,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsDateSeparator,
                     control: _Dropdown<DateSeparator>(
+                      label: l10n.settingsDateSeparator,
                       id: 'settings.dateSeparator',
                       value: units.dateSeparator,
                       items: DateSeparator.values,
@@ -173,6 +178,7 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingRow(
                     label: l10n.settingsChartDefaultRange,
                     control: _Dropdown<ChartRangePreset>(
+                      label: l10n.settingsChartDefaultRange,
                       id: 'settings.chartRange',
                       value: chartRange,
                       items: ChartRangePreset.values,
@@ -195,6 +201,7 @@ class SettingsScreen extends ConsumerWidget {
                     // Named after the typed pair, shown as the calculated one.
                     control: _Dropdown<FuelEntryMode>(
                       id: 'settings.fuelCalculated',
+                      label: l10n.settingsFuelCalculated,
                       value: ref.watch(fuelEntryModeProvider),
                       items: FuelEntryMode.values,
                       labelOf: (m) => switch (m) {
@@ -705,11 +712,14 @@ class _ToggleRow extends StatelessWidget {
                   ),
                 ),
               ),
-              Switch(
-                value: value,
-                onChanged: onChanged,
-                activeThumbColor: Colors.white,
-                activeTrackColor: t.accentGold,
+              Semantics(
+                label: label,
+                child: Switch(
+                  value: value,
+                  onChanged: onChanged,
+                  activeThumbColor: Colors.white,
+                  activeTrackColor: t.accentGold,
+                ),
               ),
             ],
           ),
@@ -762,34 +772,42 @@ class _TabOrderRow extends StatelessWidget {
           Expanded(
             child: logTag(
               'settings.tabOrder.row',
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => onChanged(!value),
-                child: Row(
-                  children: [
-                    Icon(icon, size: 18, color: t.textTertiary),
-                    const SizedBox(width: DashSpace.md),
-                    Expanded(
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontFamily: DashTokens.fontUi,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
-                          color: t.textPrimary,
+              Semantics(
+                label: label,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => onChanged(!value),
+                  child: Row(
+                    children: [
+                      Icon(icon, size: 18, color: t.textTertiary),
+                      const SizedBox(width: DashSpace.md),
+                      Expanded(
+                        child: ExcludeSemantics(
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              fontFamily: DashTokens.fontUi,
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w600,
+                              color: t.textPrimary,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: t.accentGold,
+          Semantics(
+            label: label,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeThumbColor: Colors.white,
+              activeTrackColor: t.accentGold,
+            ),
           ).tagged('settings.tabOrder.toggle'),
         ],
       ),
@@ -801,6 +819,7 @@ class _TabOrderRow extends StatelessWidget {
 class _Dropdown<T> extends StatelessWidget {
   const _Dropdown({
     required this.id,
+    required this.label,
     required this.value,
     required this.items,
     required this.labelOf,
@@ -810,6 +829,11 @@ class _Dropdown<T> extends StatelessWidget {
   /// Log identifier of the select; each row carries `<id>.option`, since the
   /// menu opens in a route the select's tag does not reach.
   final String id;
+
+  /// The setting's name. It goes **inside** the tag: a tag is a node of its own and
+  /// does not take the label of a `Semantics` around it, so there it would never
+  /// reach the node that holds the tap.
+  final String label;
   final T value;
   final List<T> items;
   final String Function(T) labelOf;
@@ -824,29 +848,40 @@ class _Dropdown<T> extends StatelessWidget {
     // button grow to show the second line (the default clips it at 48).
     return IntrinsicWidth(
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          isExpanded: true,
-          itemHeight: null,
-          value: value,
-          borderRadius: BorderRadius.circular(14),
-          dropdownColor: t.overlaySurface,
-          style: TextStyle(
-            fontFamily: DashTokens.fontUi,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: t.textPrimary,
+        child: Semantics(
+          label: label,
+          child: DropdownButton<T>(
+            isExpanded: true,
+            itemHeight: null,
+            value: value,
+            borderRadius: BorderRadius.circular(14),
+            dropdownColor: t.overlaySurface,
+            style: TextStyle(
+              fontFamily: DashTokens.fontUi,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: t.textPrimary,
+            ),
+            icon: Icon(Icons.arrow_drop_down, color: t.textSecondary),
+            items: [
+              for (final item in items)
+                DropdownMenuItem(
+                  value: item,
+                  // The button an option is takes its name from here; the tag below
+                  // names the option for the log and is not tappable itself.
+                  child: Semantics(
+                    label: labelOf(item),
+                    child: logTag(
+                      '$id.option',
+                      ExcludeSemantics(child: Text(labelOf(item))),
+                    ),
+                  ),
+                ),
+            ],
+            onChanged: (v) {
+              if (v != null) onChanged(v);
+            },
           ),
-          icon: Icon(Icons.arrow_drop_down, color: t.textSecondary),
-          items: [
-            for (final item in items)
-              DropdownMenuItem(
-                value: item,
-                child: logTag('$id.option', Text(labelOf(item))),
-              ),
-          ],
-          onChanged: (v) {
-            if (v != null) onChanged(v);
-          },
         ).tagged(id),
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../../core/diagnostics/log_form.dart';
 import '../../common/confirm_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -198,10 +198,16 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
                   ),
                   if (_isEditing)
                     IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).deleteButtonTooltip,
                       icon: Icon(Icons.delete_outline, color: t.dangerInk),
                       onPressed: _submitting ? null : _confirmDelete,
                     ).tagged('form.delete'),
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     icon: const Icon(Icons.close),
                     onPressed: _submitting
                         ? null

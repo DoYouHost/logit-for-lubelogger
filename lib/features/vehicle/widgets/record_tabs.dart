@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/format/formatters.dart';
@@ -250,7 +250,7 @@ class FuelTab extends ConsumerWidget {
     final units = ref.watch(vehicleUnitsProvider(vehicleId));
     final symbol = ref.watch(currencySymbolProvider);
     final async = ref.watch(gasRecordsProvider(vehicleId));
-    final stats = ref.watch(gasStatsProvider(vehicleId)).valueOrNull;
+    final stats = ref.watch(gasStatsProvider(vehicleId)).value;
 
     String econ(double? rawRatio) {
       if (rawRatio == null) return _placeholder;

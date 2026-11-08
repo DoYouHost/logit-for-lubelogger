@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_diagnostics/app_diagnostics.dart';
 
@@ -34,7 +34,7 @@ class _VehiclePickerSheet extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final t = DashTokens.of(context);
     final baseUrl = ref.watch(serverProfileProvider)?.baseUrl ?? '';
-    final apiKey = ref.watch(apiKeyProvider).valueOrNull;
+    final apiKey = ref.watch(apiKeyProvider).value;
 
     // Bottom inset only — the sheet is centered via its width constraint, so a
     // landscape cutout inset on the notch side would push the list off-centre.

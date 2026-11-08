@@ -36,6 +36,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get apiKeyLabel => 'Klucz API';
 
   @override
+  String get apiKeyShow => 'Pokaż klucz';
+
+  @override
+  String get apiKeyHide => 'Ukryj klucz';
+
+  @override
   String get connect => 'Połącz';
 
   @override

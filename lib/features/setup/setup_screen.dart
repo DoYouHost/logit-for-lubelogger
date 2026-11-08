@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/demo/demo_config.dart';
@@ -147,6 +147,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 labelText: l10n.apiKeyLabel,
                 prefixIcon: Icon(Icons.key_outlined, color: t.textTertiary),
                 suffixIcon: IconButton(
+                  tooltip: _obscureKey ? l10n.apiKeyShow : l10n.apiKeyHide,
                   icon: Icon(
                     _obscureKey
                         ? Icons.visibility_outlined

@@ -19,11 +19,12 @@ All pinned in [`pubspec.yaml`](../pubspec.yaml) as git dependencies on
 
 | Package | Holds | Local half |
 |---|---|---|
-| `app_report_client` (v0.2.0) | relay client, outbox, sender, log redactor | `report_config.dart` (relay URL, redactor keys) |
+| `app_report_client` | relay client, outbox, sender, log redactor | `report_config.dart` (relay URL, redactor keys) |
 | `app_diagnostics` | recording session, log record, disk mirror, isolate merge, probes (tap, route, HTTP, error, lifecycle), device facts, session store | `diagnostics_wiring.dart`, `session_facts.dart`, `image_probe.dart`, `log_form.dart` |
 | `app_report_ui` | the guided report screens, recording banner, review | `features/bug_report/report_wiring.dart` (`ReportBindings`) |
 | `dash_kit` (re-exports `dash_ui`) | design system, tokens, confirm dialog, sheets, error/empty views, content width cap | `core/theme/dash_theme.dart` (`lubeLoggerBrand`, re-exports `dash_kit`) |
 | `app_util` | JSON coercion, user-typed numbers, server-address handling, `DioFailure` classification, byte formatting, `DemoHttpClientAdapter` | `AppErrorCode` and the exception classes, `DemoBackend` |
+| `app_test_kit` (dev) | the generic half of the test helpers: request log, exact-body mock server, scripted adapter, clock and timer fakes, diagnostic-id finders (`byLogId`), a phone-shaped window | `test/` |
 | `app_guards` (dev) | source-scan tests (spacing scale, `Wrap` run spacing, short words, finder strings) and executables: `l10n_sync`, `l10n_language`, `glue_short_words`, `aab_versions`, `play` (all run from the justfile), `commit_msg` (the `.githooks/commit-msg` hook) and `log_coverage` | `tool/*.toml` configuration, the thin tests |
 
 The tool scripts that used to be copied into `tool/` (`aab_versions.py`,
@@ -41,12 +42,15 @@ The tool scripts that used to be copied into `tool/` (`aab_versions.py`,
 - **One package must resolve from one ref.** A package that two others name at
   different refs fails version solving, so `app_report_client` must be the ref
   `app_diagnostics` names for its own copy, and `app_diagnostics`, `app_report_ui`,
-  `dash_kit`, `app_util` and `app_guards` move together (all `v0.13.1` at the time
-  of writing; `app_report_client` stays at its own tag). Bump all of them in one
+  `dash_kit`, `app_util`, `app_guards` and `app_test_kit` move together (all
+  `v0.14.7` at the time of writing, `app_report_client` included: from `v0.14.7` the
+  shared packages name it at their own tag instead of `v0.2.0`). Bump all of them in one
   commit, after the tag exists upstream.
-- **While a tag does not exist yet**, resolve through a local
-  `pubspec_overrides.yaml` (gitignored). None may remain once the lock names the
-  tag.
+- **Never add a `pubspec_overrides.yaml` to this repository.** It swaps packages
+  for local paths and `pub get` does it silently. Release the shared packages with a
+  normal tag first, then bump here: in `app-shared` one commit where every `ref:` in
+  `packages/*/pubspec.yaml` already names the new tag, the annotated tag on that
+  commit, `master` and the tag pushed.
 - `pubspec.lock` is committed and CI runs `flutter pub get --enforce-lockfile`,
   after an uncommitted lock let CI resolve a newer plugin than any developer had.
 
