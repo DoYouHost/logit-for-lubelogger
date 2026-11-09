@@ -609,7 +609,12 @@ Finder a11yByLogIdStarting(String prefix) => find.byWidgetPredicate(
 /// * [scroll] re-asserts after each viewport of the main list;
 /// * [textScales] are the extra text sizes, see [a11yTextScales]. A surface that
 ///   cannot hold one passes a narrower list and says why in a comment, never
-///   drops it silently.
+///   drops it silently;
+/// * [skip] switches the whole surface off, for a screen whose findings are all in
+///   code this repository does not own and the maintainer has accepted. It takes
+///   the reason, which a reader of the call sees next to it; the test body is not
+///   run. A red that is not fixed is better skipped openly than hidden in a
+///   narrower guideline.
 void a11ySurface(
   String name, {
   String location = '/',
@@ -623,6 +628,7 @@ void a11ySurface(
   Map<String, Object> prefs = const {},
   bool signedIn = true,
   List<double> textScales = a11yTextScales,
+  String? skip,
 }) {
   final runs = <(Brightness, double)>[
     for (final brightness in Brightness.values) (brightness, 1),
@@ -630,7 +636,9 @@ void a11ySurface(
   ];
   for (final (brightness, scale) in runs) {
     final label = scale == 1 ? '' : ', text ${(scale * 100).round()}%';
-    testWidgets('$name: ${brightness.name}$label', (tester) async {
+    testWidgets(skip: skip != null, '$name: ${brightness.name}$label', (
+      tester,
+    ) async {
       final handle = tester.ensureSemantics();
       await a11yPumpApp(
         tester,

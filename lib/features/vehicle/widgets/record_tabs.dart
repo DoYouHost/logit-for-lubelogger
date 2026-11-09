@@ -340,6 +340,7 @@ class FuelTab extends ConsumerWidget {
               DashPill(
                 label: l10n.fuelPillAvg(econLabel(avgDisplayed)),
                 accent: t.accentBlue,
+                accentInk: t.accentBlueInk,
               ),
               if (economies.isNotEmpty) ...[
                 DashPill(
@@ -347,12 +348,14 @@ class FuelTab extends ConsumerWidget {
                     econLabel(economies.reduce((a, b) => a < b ? a : b)),
                   ),
                   accent: t.accentBlue,
+                  accentInk: t.accentBlueInk,
                 ),
                 DashPill(
                   label: l10n.fuelPillMax(
                     econLabel(economies.reduce((a, b) => a > b ? a : b)),
                   ),
                   accent: t.accentBlue,
+                  accentInk: t.accentBlueInk,
                 ),
               ],
               if (stats != null)

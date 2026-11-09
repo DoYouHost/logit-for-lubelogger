@@ -279,9 +279,11 @@ class _AttachmentsFieldState extends ConsumerState<AttachmentsField> {
         IconButton(
           tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
           icon: const Icon(Icons.close, size: 16),
-          visualDensity: VisualDensity.compact,
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          constraints: const BoxConstraints(
+            minWidth: kMinInteractiveDimension,
+            minHeight: kMinInteractiveDimension,
+          ),
           color: t.textTertiary,
           onPressed: _busy ? null : () => _remove(file),
         ),

@@ -43,7 +43,7 @@ The tool scripts that used to be copied into `tool/` (`aab_versions.py`,
   different refs fails version solving, so `app_report_client` must be the ref
   `app_diagnostics` names for its own copy, and `app_diagnostics`, `app_report_ui`,
   `dash_kit`, `app_util`, `app_guards` and `app_test_kit` move together (all
-  `v0.14.7` at the time of writing, `app_report_client` included: from `v0.14.7` the
+  `v0.14.8` at the time of writing, `app_report_client` included: from `v0.14.7` the
   shared packages name it at their own tag instead of `v0.2.0`). Bump all of them in one
   commit, after the tag exists upstream.
 - **Never add a `pubspec_overrides.yaml` to this repository.** It swaps packages

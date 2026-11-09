@@ -406,7 +406,7 @@ class _VehicleTabBar extends StatelessWidget {
             logTag(
               'vehicle.tabbar.${tab.id}',
               Tab(
-                height: 44,
+                height: kMinInteractiveDimension,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: DashSpace.md),
                   child: Row(

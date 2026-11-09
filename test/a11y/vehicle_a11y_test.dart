@@ -154,6 +154,15 @@ void main() {
 
     a11ySurface(
       'dashboard: custom range picker',
+      // Skipped on purpose, accepted by the maintainer (release/1.0.0): the screen
+      // is Flutter's own `showDateRangePicker`. Its day cells are 42 dp tall and
+      // its Close and Save buttons 34 dp, constants in the framework that no theme
+      // reaches, so all four findings are in code this repository does not own.
+      // The alternatives (our own range sheet, or two single date pickers) were
+      // weighed and turned down to keep Material's range band. Re-enable when the
+      // picker is replaced or Flutter raises these sizes.
+      skip:
+          'Material showDateRangePicker: 42 dp day cells and 34 dp Close/Save',
       location: _vehicle,
       arrange: (tester) async {
         await a11yTap(tester, byLogId('dashboard.chartRange').first);

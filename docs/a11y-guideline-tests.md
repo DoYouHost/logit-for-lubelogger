@@ -119,15 +119,19 @@ Found fixing the label findings (1104 of them, down to the recording bar's 14):
 
 ## State
 
-718 tests plus the harness's own, **471 green and 251 red** after the label fixes (722
-before: 226 and 496). Nothing is red for a harness reason. One label finding is left,
-and it is not in this repository: the recording bar's move, mark, collapse and finish
-buttons (`app_report_ui`, `recording_banner.dart`) put `label:` and the identifier on a
-`Semantics` around the `IconButton`, so the button's own node has no name. Fixing it is
-a change in `app-shared` and a new tag.
+718 tests plus the harness's own, **718 green, 4 skipped, none red**. Nothing is red for a
+harness reason. The four skipped are `dashboard: custom range picker`, switched off with
+`a11ySurface(skip:)` and a comment at the call: `showDateRangePicker` is Flutter's own, its day
+cells are 42 dp tall and its "close" and "save" buttons 34 dp, constants no theme reaches. The
+maintainer chose to keep Material's range picker (with its band between the two dates) over a
+sheet of our own or two single date pickers, so these are accepted, not forgotten. Re-enable
+them when the picker is replaced or Flutter raises those sizes.
 
-What is still red, in order of how many tests it takes:
+The recording bar (`app_report_ui`, `recording_banner.dart`) was the rest of the red until
+`app-shared` v0.14.8: its buttons are named inside their own node, have a 48 dp target, and the
+bar wraps onto a second line at a large text size instead of overflowing.
 
-- tap targets under 48 dp, now measured honestly (full-width rows included);
-- contrast in the light theme, the wordmark first (2.09:1 at 30 sp, needs 3:1);
-- overflow of the recording bar and of the review screen at 150 % and 200 % text.
+When you render a screen for a before/after image, load the `MaterialIcons` font from the
+Flutter SDK (`bin/cache/artifacts/material_fonts`) with a `FontLoader`: without it every icon
+is a tofu square with a different baseline, which looks like a centring bug and is not one.
+The tests themselves do not need it.

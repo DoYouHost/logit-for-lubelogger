@@ -607,8 +607,10 @@ class _LinkRow extends StatelessWidget {
       InkWell(
         borderRadius: BorderRadius.circular(8),
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: DashSpace.xs),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: kMinInteractiveDimension,
+          ),
           child: Row(
             children: [
               Expanded(
@@ -777,24 +779,29 @@ class _TabOrderRow extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => onChanged(!value),
-                  child: Row(
-                    children: [
-                      Icon(icon, size: 18, color: t.textTertiary),
-                      const SizedBox(width: DashSpace.md),
-                      Expanded(
-                        child: ExcludeSemantics(
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              fontFamily: DashTokens.fontUi,
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w600,
-                              color: t.textPrimary,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: kMinInteractiveDimension,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icon, size: 18, color: t.textTertiary),
+                        const SizedBox(width: DashSpace.md),
+                        Expanded(
+                          child: ExcludeSemantics(
+                            child: Text(
+                              label,
+                              style: TextStyle(
+                                fontFamily: DashTokens.fontUi,
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w600,
+                                color: t.textPrimary,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
