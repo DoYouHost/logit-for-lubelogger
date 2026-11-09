@@ -611,21 +611,24 @@ class _LinkRow extends StatelessWidget {
           constraints: const BoxConstraints(
             minHeight: kMinInteractiveDimension,
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: DashTokens.fontUi,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                    color: t.textPrimary,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: DashSpace.xs),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: DashTokens.fontUi,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: t.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: t.textTertiary),
-            ],
+                Icon(Icons.chevron_right, color: t.textTertiary),
+              ],
+            ),
           ),
         ),
       ),
