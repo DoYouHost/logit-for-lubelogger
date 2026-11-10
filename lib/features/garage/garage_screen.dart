@@ -80,7 +80,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen>
           backgroundColor: Colors.transparent,
           appBar: dashAppBar(
             context,
-            titleWidget: const LubeLoggerWordmark(),
+            titleWidget: const AppWordmark(),
             actions: [
               const SyncStatusAction(),
               // On the home screen rather than only in settings: a bug is

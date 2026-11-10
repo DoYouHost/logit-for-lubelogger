@@ -9,7 +9,7 @@ class AppLocalizationsPl extends AppLocalizations {
   AppLocalizationsPl([String locale = 'pl']) : super(locale);
 
   @override
-  String get appTitle => 'LubeLogger';
+  String get appTitle => 'Logit';
 
   @override
   String get connectToServer => 'Połącz z serwerem';

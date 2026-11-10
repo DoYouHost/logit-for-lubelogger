@@ -112,7 +112,7 @@ final List<Override> a11yPlatformOverrides = [
   ),
   packageInfoProvider.overrideWith(
     (ref) async => PackageInfo(
-      appName: 'LubeLogger',
+      appName: 'Logit',
       packageName: 'page.codeberg.doyouhost.lubelogger_mobile',
       version: '1.0.0',
       buildNumber: '1',

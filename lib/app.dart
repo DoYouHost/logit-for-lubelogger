@@ -14,7 +14,7 @@ class LubeLoggerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'LubeLogger',
+      title: 'Logit',
       theme: buildDashThemeData(Brightness.light, brand: lubeLoggerBrand),
       darkTheme: buildDashThemeData(Brightness.dark, brand: lubeLoggerBrand),
       // Follow the system setting; the design is dark-first.

@@ -68,7 +68,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     bottom: DashSpace.xs,
                     left: DashSpace.xs,
                   ),
-                  child: LubeLoggerWordmark(fontSize: 30),
+                  child: AppWordmark(fontSize: 30),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(

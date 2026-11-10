@@ -56,70 +56,85 @@ class RecordFormScaffold extends StatelessWidget {
     return Padding(
       // Lift the sheet above the keyboard.
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          DashSpace.xl,
-          DashSpace.xs,
-          DashSpace.xl,
-          DashSpace.xl,
-        ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontFamily: DashTokens.fontUi,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: t.textPrimary,
-                      ),
-                    ),
-                  ),
-                  // The chrome names itself here, once, for every form that
-                  // uses this shell — the fields inside stay unnamed and report
-                  // as the form's own surface (`form.fuel`, `form.note`, …).
-                  if (isEditing && onDelete != null)
-                    IconButton(
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).deleteButtonTooltip,
-                      icon: Icon(Icons.delete_outline, color: t.dangerInk),
-                      onPressed: submitting ? null : onDelete,
-                    ).tagged('form.delete'),
-                  IconButton(
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    icon: const Icon(Icons.close),
-                    onPressed: submitting ? null : onCancel,
-                  ).tagged('form.close'),
-                ],
-              ),
-              const SizedBox(height: DashSpace.sm),
-              if (notice != null) ...[
-                notice!,
-                const SizedBox(height: DashSpace.lg),
-              ],
-              ...fields,
-              if (error != null) ...[
-                const SizedBox(height: DashSpace.md),
-                Text(
-                  error!,
-                  style: TextStyle(
-                    color: t.dangerInk,
-                    fontFamily: DashTokens.fontUi,
-                  ),
+      child: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Only the fields scroll: on a short screen (a landscape tablet)
+            // a fully scrolling sheet pushed the buttons below the fold.
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  DashSpace.xl,
+                  DashSpace.xs,
+                  DashSpace.xl,
+                  0,
                 ),
-              ],
-              const SizedBox(height: DashSpace.xl),
-              Row(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontFamily: DashTokens.fontUi,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: t.textPrimary,
+                            ),
+                          ),
+                        ),
+                        // The chrome names itself here, once, for every form that
+                        // uses this shell — the fields inside stay unnamed and report
+                        // as the form's own surface (`form.fuel`, `form.note`, …).
+                        if (isEditing && onDelete != null)
+                          IconButton(
+                            tooltip: MaterialLocalizations.of(
+                              context,
+                            ).deleteButtonTooltip,
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: t.dangerInk,
+                            ),
+                            onPressed: submitting ? null : onDelete,
+                          ).tagged('form.delete'),
+                        IconButton(
+                          tooltip: MaterialLocalizations.of(
+                            context,
+                          ).closeButtonTooltip,
+                          icon: const Icon(Icons.close),
+                          onPressed: submitting ? null : onCancel,
+                        ).tagged('form.close'),
+                      ],
+                    ),
+                    const SizedBox(height: DashSpace.sm),
+                    if (notice != null) ...[
+                      notice!,
+                      const SizedBox(height: DashSpace.lg),
+                    ],
+                    ...fields,
+                    if (error != null) ...[
+                      const SizedBox(height: DashSpace.md),
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: t.dangerInk,
+                          fontFamily: DashTokens.fontUi,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(DashSpace.xl),
+              child: Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
@@ -144,8 +159,8 @@ class RecordFormScaffold extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

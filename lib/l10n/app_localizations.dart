@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Application name, shown in the launcher and title bar.
   ///
   /// In en, this message translates to:
-  /// **'LubeLogger'**
+  /// **'Logit'**
   String get appTitle;
 
   /// Title of the login / server setup screen.

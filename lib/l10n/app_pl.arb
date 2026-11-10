@@ -1,6 +1,6 @@
 {
   "@@locale": "pl",
-  "appTitle": "LubeLogger",
+  "appTitle": "Logit",
 
   "connectToServer": "Połącz z serwerem",
   "setupIntro": "Podaj adres serwera LubeLogger i klucz API, aby rozpocząć.",

@@ -30,10 +30,10 @@ extension LubeLoggerAccent on DashTokens {
   Color get accentGoldInk => accentInk;
 }
 
-/// The "LubeLogger" wordmark: italic Manrope 800 in the gold accent. No image
+/// The "Logit" wordmark: italic Manrope 800 in the gold accent. No image
 /// asset exists — the mark is always set as text (see design handoff).
-class LubeLoggerWordmark extends StatelessWidget {
-  const LubeLoggerWordmark({super.key, this.fontSize = 21});
+class AppWordmark extends StatelessWidget {
+  const AppWordmark({super.key, this.fontSize = 21});
 
   final double fontSize;
 
@@ -41,7 +41,7 @@ class LubeLoggerWordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = DashTokens.of(context);
     return Text(
-      'LubeLogger',
+      'Logit',
       style: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: fontSize,
