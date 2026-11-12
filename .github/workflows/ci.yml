@@ -6,11 +6,11 @@ name: CI
 
 on:
   pull_request:
-    # dev too, so a contributor's pull request shows its result; only main
+    # dev too, so a contributor's pull request shows its result; only master
     # requires the check.
-    branches: [main, dev]
+    branches: [master, dev]
     # No paths-ignore: a workflow that does not run reports no check, and the
-    # required status on main would wait forever. The filter is the `changes` job.
+    # required status on master would wait forever. The filter is the `changes` job.
   workflow_dispatch:
 
 # A force-push cancels the previous run.
@@ -158,7 +158,7 @@ jobs:
       - name: Compile check
         run: flutter build apk --debug --target-platform android-arm64
 
-  # The one status main requires. A skipped job (docs-only change) counts as
+  # The one status master requires. A skipped job (docs-only change) counts as
   # passed; a failed or cancelled one does not.
   check:
     name: analyze · test · build

@@ -7,13 +7,13 @@ LubeLogger.
 
 ## CI is the answer to most questions
 
-Every pull request into `main` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
+Every pull request into `master` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
 `flutter pub get --enforce-lockfile`, `dart format --output=none
 --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test` and a debug
 APK compile. A pull request that touches only `docs/`, `site/`, `reference/` or
 `*.md` skips everything after the path check and still reports green. It runs on
 GitHub-hosted runners as parallel jobs (analyze, test, build) behind one
-`analyze · test · build` job, the status `main` requires. The pull request is
+`analyze · test · build` job, the status `master` requires. The pull request is
 opened as a draft by `just release-start`, so CI runs on every push to
 `release/X.Y.Z` through it; there is no `push` trigger, which would run it twice.
 A pull request into `dev` gets the same run, but nothing there requires it, and a
@@ -113,10 +113,10 @@ inside an unrelated change and do not stay silent.
   measures. **Read it before touching `test/a11y/` or fixing a guideline finding.**
 - [docs/performance.md](docs/performance.md) — measuring before claiming, and the
   scroll benchmark harness.
-- [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `main`:
+- [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `master`:
   what each branch is for, how a release is cut and merged, why a release PR is never
-  squashed and why `main` goes back into `dev`. **Read it before opening a PR into
-  `main` or running `ship`.**
+  squashed and why `master` goes back into `dev`. **Read it before opening a PR into
+  `master` or running `ship`.**
 - [docs/release.md](docs/release.md) — `ship`, `ship-dev`, the version-code scheme,
   R8 and resource-shrinking traps that only show in a release build. **Read it
   before touching a recipe, the proguard rules or adding a plugin.**

@@ -41,7 +41,7 @@ recipes call `gh --repo`.
   flatten the merge commits a release branch carries) and skips the pull only
   when `ls-remote --exit-code` returns **2** (no such branch yet); it aborts on any
   other code, so an unreachable origin cannot yield a release built on a stale
-  tree. `release-publish` makes sure the draft PR into `main` exists and marks it
+  tree. `release-publish` makes sure the draft PR into `master` exists and marks it
   ready once the release is published.
 - **Every step is resumable.** `_bump` skips the edit and commit when the version
   is already bumped; `release-publish` skips an existing release;
