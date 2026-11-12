@@ -9,7 +9,7 @@ class AppLocalizationsPl extends AppLocalizations {
   AppLocalizationsPl([String locale = 'pl']) : super(locale);
 
   @override
-  String get appTitle => 'LubeLogger';
+  String get appTitle => 'Logit';
 
   @override
   String get connectToServer => 'Połącz z serwerem';
@@ -34,6 +34,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get apiKeyLabel => 'Klucz API';
+
+  @override
+  String get apiKeyShow => 'Pokaż klucz';
+
+  @override
+  String get apiKeyHide => 'Ukryj klucz';
 
   @override
   String get connect => 'Połącz';

@@ -1,5 +1,5 @@
 import 'package:app_report_ui/app_report_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/dash_theme.dart';
@@ -14,14 +14,15 @@ class LubeLoggerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'LubeLogger',
+      title: 'Logit',
       theme: buildDashThemeData(Brightness.light, brand: lubeLoggerBrand),
       darkTheme: buildDashThemeData(Brightness.dark, brand: lubeLoggerBrand),
       // Follow the system setting; the design is dark-first.
       themeMode: ThemeMode.system,
       // Locale auto-detected from the system; en is the fallback.
       localizationsDelegates: [
-        ...AppLocalizations.localizationsDelegates,
+        AppLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
         ReportLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,

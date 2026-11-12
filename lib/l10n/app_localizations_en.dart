@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'LubeLogger';
+  String get appTitle => 'Logit';
 
   @override
   String get connectToServer => 'Connect to server';
@@ -33,6 +33,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get apiKeyLabel => 'API key';
+
+  @override
+  String get apiKeyShow => 'Show the key';
+
+  @override
+  String get apiKeyHide => 'Hide the key';
 
   @override
   String get connect => 'Connect';

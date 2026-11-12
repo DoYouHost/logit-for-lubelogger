@@ -1,6 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
-import '../../../core/diagnostics/log_form.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../common/confirm_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_diagnostics/app_diagnostics.dart';
@@ -17,6 +16,7 @@ import '../../../providers.dart';
 import 'attachments_field.dart';
 import 'extra_fields_field.dart';
 import 'form_fields.dart';
+import 'record_form_scaffold.dart';
 
 /// Opens the "Add odometer reading" form as a modal bottom sheet. Pass
 /// [existing] to edit that reading instead (prefilled, with a delete option).
@@ -95,15 +95,14 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
     final t = DashTokens.of(context);
     final units = ref.watch(vehicleUnitsProvider(widget.vehicleId));
     final previous = _previousReading(
-      ref.watch(odometerRecordsProvider(widget.vehicleId)).valueOrNull ??
-          const [],
+      ref.watch(odometerRecordsProvider(widget.vehicleId)).value ?? const [],
       // Only an added reading can fall back to it, so an edit does not even
       // ask — watching it would fetch the vehicle for a value it discards.
       _isEditing
           ? null
           : ref
                 .watch(vehicleInfoProvider(widget.vehicleId))
-                .valueOrNull
+                .value
                 ?.lastReportedOdometer,
     );
     final previousText = previous == null
@@ -114,166 +113,86 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
     final goesBackwards =
         previous != null && entered != null && entered < previous;
 
-    return Padding(
-      // Lift the sheet above the keyboard.
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          DashSpace.xl,
-          DashSpace.xs,
-          DashSpace.xl,
-          DashSpace.xl,
+    return RecordFormScaffold(
+      formKey: _formKey,
+      title: _isEditing ? l10n.formOdometerEditTitle : l10n.formOdometerTitle,
+      isEditing: _isEditing,
+      submitting: _submitting,
+      onCancel: () => Navigator.pop(context),
+      onSubmit: _submit,
+      onDelete: _isEditing ? _confirmDelete : null,
+      error: _error,
+      fields: [
+        DateField(
+          text: units.formatDate(_date),
+          onPick: _submitting ? null : _pickDate,
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _isEditing
-                          ? l10n.formOdometerEditTitle
-                          : l10n.formOdometerTitle,
-                      style: TextStyle(
-                        fontFamily: DashTokens.fontUi,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: t.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (_isEditing)
-                    IconButton(
-                      icon: Icon(Icons.delete_outline, color: t.dangerInk),
-                      onPressed: _submitting ? null : _confirmDelete,
-                    ).tagged('form.delete'),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: _submitting
-                        ? null
-                        : () => Navigator.pop(context),
-                  ).tagged('form.close'),
-                ],
+        const SizedBox(height: DashSpace.lg),
+        TextFormField(
+          controller: _odometer,
+          enabled: !_submitting,
+          keyboardType: numberKeyboard(decimal: false),
+          inputFormatters: integerInputFormatters,
+          style: const TextStyle(fontFamily: DashTokens.fontMono),
+          decoration:
+              dashFieldDecoration(
+                t,
+                labelText: l10n.formOdometerLabel(units.distanceLabel),
+              ).copyWith(
+                // One line under the field, which turns from the hint into
+                // the warning. A lower reading is legitimate often enough (a
+                // swapped cluster, a correction) that it must not block the
+                // save — hence this and a confirmation on submit, rather than
+                // a validator error.
+                helperText: previousText == null
+                    ? null
+                    : goesBackwards
+                    ? l10n.formOdometerBackwards(previousText)
+                    : l10n.formOdometerLast(previousText),
+                helperStyle: goesBackwards
+                    ? TextStyle(color: t.accentOrange)
+                    : null,
+                helperMaxLines: 2,
               ),
-              const SizedBox(height: DashSpace.sm),
-              DateField(
-                text: units.formatDate(_date),
-                onPick: _submitting ? null : _pickDate,
-              ),
-              const SizedBox(height: DashSpace.lg),
-              TextFormField(
-                controller: _odometer,
-                enabled: !_submitting,
-                keyboardType: numberKeyboard(decimal: false),
-                inputFormatters: integerInputFormatters,
-                style: const TextStyle(fontFamily: DashTokens.fontMono),
-                decoration:
-                    dashFieldDecoration(
-                      t,
-                      labelText: l10n.formOdometerLabel(units.distanceLabel),
-                    ).copyWith(
-                      // One line under the field, which turns from the hint into
-                      // the warning. A lower reading is legitimate often enough (a
-                      // swapped cluster, a correction) that it must not block the
-                      // save — hence this and a confirmation on submit, rather than
-                      // a validator error.
-                      helperText: previousText == null
-                          ? null
-                          : goesBackwards
-                          ? l10n.formOdometerBackwards(previousText)
-                          : l10n.formOdometerLast(previousText),
-                      helperStyle: goesBackwards
-                          ? TextStyle(color: t.accentOrange)
-                          : null,
-                      helperMaxLines: 2,
-                    ),
-                validator: (raw) {
-                  final value = parseUserDecimal(raw);
-                  if (value == null) {
-                    return (raw == null || raw.trim().isEmpty)
-                        ? l10n.validationRequired
-                        : l10n.validationNumber;
-                  }
-                  if (value <= 0) return l10n.validationNumber;
-                  return null;
-                },
-              ),
-              const SizedBox(height: DashSpace.lg),
-              TextFormField(
-                controller: _tags,
-                enabled: !_submitting,
-                decoration: dashFieldDecoration(
-                  t,
-                  labelText: l10n.formTagsOptional,
-                ),
-              ),
-              const SizedBox(height: DashSpace.lg),
-              TextFormField(
-                controller: _notes,
-                enabled: !_submitting,
-                minLines: 2,
-                maxLines: 4,
-                decoration: dashFieldDecoration(
-                  t,
-                  labelText: l10n.formNotesOptional,
-                ),
-              ),
-              const SizedBox(height: DashSpace.lg),
-              ExtraFieldsField(
-                recordType: ExtraFieldRecordType.odometer,
-                initial: _extraFields,
-                enabled: !_submitting,
-                onChanged: (fields) => _extraFields = fields,
-              ),
-              const SizedBox(height: DashSpace.lg),
-              AttachmentsField(
-                initial: _files,
-                enabled: !_submitting,
-                onChanged: (files) => _files = files,
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: DashSpace.md),
-                Text(
-                  _error!,
-                  style: TextStyle(
-                    color: t.dangerInk,
-                    fontFamily: DashTokens.fontUi,
-                  ),
-                ),
-              ],
-              const SizedBox(height: DashSpace.xl),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _submitting
-                          ? null
-                          : () => Navigator.pop(context),
-                      child: Text(l10n.actionCancel),
-                    ).tagged('form.cancel'),
-                  ),
-                  const SizedBox(width: DashSpace.md),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _submitting ? null : _submit,
-                      child: _submitting
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(_isEditing ? l10n.actionSave : l10n.actionAdd),
-                    ).tagged('form.submit'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          validator: (raw) {
+            final value = parseUserDecimal(raw);
+            if (value == null) {
+              return (raw == null || raw.trim().isEmpty)
+                  ? l10n.validationRequired
+                  : l10n.validationNumber;
+            }
+            if (value <= 0) return l10n.validationNumber;
+            return null;
+          },
         ),
-      ),
+        const SizedBox(height: DashSpace.lg),
+        TextFormField(
+          controller: _tags,
+          enabled: !_submitting,
+          decoration: dashFieldDecoration(t, labelText: l10n.formTagsOptional),
+        ),
+        const SizedBox(height: DashSpace.lg),
+        TextFormField(
+          controller: _notes,
+          enabled: !_submitting,
+          minLines: 2,
+          maxLines: 4,
+          decoration: dashFieldDecoration(t, labelText: l10n.formNotesOptional),
+        ),
+        const SizedBox(height: DashSpace.lg),
+        ExtraFieldsField(
+          recordType: ExtraFieldRecordType.odometer,
+          initial: _extraFields,
+          enabled: !_submitting,
+          onChanged: (fields) => _extraFields = fields,
+        ),
+        const SizedBox(height: DashSpace.lg),
+        AttachmentsField(
+          initial: _files,
+          enabled: !_submitting,
+          onChanged: (files) => _files = files,
+        ),
+      ],
     );
   }
 
@@ -303,12 +222,12 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
   /// [_previousReading]'s inputs, read rather than watched — for the submit
   /// path, which runs outside a build.
   double? _previousReadingNow() => _previousReading(
-    ref.read(odometerRecordsProvider(widget.vehicleId)).valueOrNull ?? const [],
+    ref.read(odometerRecordsProvider(widget.vehicleId)).value ?? const [],
     _isEditing
         ? null
         : ref
               .read(vehicleInfoProvider(widget.vehicleId))
-              .valueOrNull
+              .value
               ?.lastReportedOdometer,
   );
 
@@ -332,7 +251,7 @@ class _AddOdometerFormState extends ConsumerState<_AddOdometerForm> {
   }
 
   Future<void> _submit() async {
-    if (!validateAndLog(context, _formKey)) return;
+    if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context);
     if (!await _confirmBackwards(l10n)) return;
     if (!mounted) return;

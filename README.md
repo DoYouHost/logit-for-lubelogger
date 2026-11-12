@@ -1,4 +1,4 @@
-# LubeLogger mobile
+# Logit
 
 A native Android companion for your self-hosted **[LubeLogger](https://lubelogger.com)**
 server — log fuel, track service and repairs, and stay on top of maintenance
@@ -70,7 +70,7 @@ Parsing is defensive — unknown fields are ignored and missing ones don't crash
 
 ## Privacy
 
-LubeLogger mobile has **no analytics, no advertising and no cloud service.** Your API
+Logit has **no analytics, no advertising and no cloud service.** Your API
 key is stored in encrypted, Android Keystore-backed storage (`flutter_secure_storage`)
 and is only ever sent to the server you configure.
 
@@ -103,6 +103,6 @@ flutter test
 
 ## License
 
-[AGPL-3.0](LICENSE). "LubeLogger" is a project of Hargata Softworks; LubeLogger mobile
+[AGPL-3.0](LICENSE). "LubeLogger" is a project of Hargata Softworks; Logit
 is an independent, community-built companion app and is not affiliated with or endorsed
 by the LubeLogger project.

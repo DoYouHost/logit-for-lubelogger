@@ -27,6 +27,8 @@ ignored_rules = [
 known_words = [
   # The server this app talks to, and the protocol names its copy uses.
   "LubeLogger", "API", "URL", "HTTP", "HTTPS",
+  # The app's own name.
+  "Logit",
   # The chart range's short labels: "1 mo", "1 yr".
   "mo", "yr",
   # English the Polish copy quotes verbatim: "Licencje open source".

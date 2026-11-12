@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api_exceptions.dart';
@@ -277,10 +277,13 @@ class _AttachmentsFieldState extends ConsumerState<AttachmentsField> {
           ),
         ),
         IconButton(
+          tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
           icon: const Icon(Icons.close, size: 16),
-          visualDensity: VisualDensity.compact,
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          constraints: const BoxConstraints(
+            minWidth: kMinInteractiveDimension,
+            minHeight: kMinInteractiveDimension,
+          ),
           color: t.textTertiary,
           onPressed: _busy ? null : () => _remove(file),
         ),

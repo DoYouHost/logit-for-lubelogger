@@ -1,5 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/dash_theme.dart';
@@ -97,7 +97,15 @@ class DateField extends StatelessWidget {
               t,
             ).copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero)),
             onPressed: onPick,
-            child: const Icon(Icons.calendar_month, size: 20),
+            child: Icon(
+              Icons.calendar_month,
+              size: 20,
+              // An icon alone on a filled button: the icon's own label is the only
+              // name its node can take.
+              semanticLabel: MaterialLocalizations.of(
+                context,
+              ).datePickerHelpText,
+            ),
           ),
         ),
       ],

@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/layout/responsive.dart';
@@ -82,82 +82,89 @@ class RecordCard extends StatelessWidget {
           InkWell(
             onTap: onTap,
             borderRadius: radius,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DashSpace.md,
-                vertical: DashSpace.md,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: kMinInteractiveDimension,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DashSpace.md,
+                    vertical: DashSpace.md,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          date,
-                          maxLines: 1,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              date,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: DashTokens.fontUi,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: t.textPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: DashSpace.sm),
+                          Text(
+                            headline,
+                            style: TextStyle(
+                              fontFamily: DashTokens.fontMono,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: headlineColor ?? t.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (description != null) ...[
+                        const SizedBox(height: DashSpace.xs),
+                        Text(
+                          description!,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: DashTokens.fontUi,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w800,
-                            color: t.textPrimary,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: t.textSecondary,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: DashSpace.sm),
-                      Text(
-                        headline,
-                        style: TextStyle(
-                          fontFamily: DashTokens.fontMono,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: headlineColor ?? t.textPrimary,
+                      ],
+                      if (meta.isNotEmpty) ...[
+                        const SizedBox(height: DashSpace.sm),
+                        Wrap(
+                          spacing: DashSpace.lg,
+                          runSpacing: DashSpace.xs,
+                          children: [for (final m in meta) _MetaItem(item: m)],
                         ),
-                      ),
+                      ],
+                      if (tags.isNotEmpty && onTagTap != null) ...[
+                        const SizedBox(height: DashSpace.sm),
+                        Wrap(
+                          spacing: DashSpace.sm,
+                          runSpacing: DashSpace.xs,
+                          children: [
+                            for (final tag in tags)
+                              RecordTagChip(
+                                tag: tag,
+                                selected: activeTags.contains(tag),
+                                onTap: () => onTagTap!(tag),
+                              ).tagged('records.tag'),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
-                  if (description != null) ...[
-                    const SizedBox(height: DashSpace.xs),
-                    Text(
-                      description!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: DashTokens.fontUi,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: t.textSecondary,
-                      ),
-                    ),
-                  ],
-                  if (meta.isNotEmpty) ...[
-                    const SizedBox(height: DashSpace.sm),
-                    Wrap(
-                      spacing: DashSpace.lg,
-                      runSpacing: DashSpace.xs,
-                      children: [for (final m in meta) _MetaItem(item: m)],
-                    ),
-                  ],
-                  if (tags.isNotEmpty && onTagTap != null) ...[
-                    const SizedBox(height: DashSpace.sm),
-                    Wrap(
-                      spacing: DashSpace.sm,
-                      runSpacing: DashSpace.xs,
-                      children: [
-                        for (final tag in tags)
-                          RecordTagChip(
-                            tag: tag,
-                            selected: activeTags.contains(tag),
-                            onTap: () => onTagTap!(tag),
-                          ).tagged('records.tag'),
-                      ],
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
           ),

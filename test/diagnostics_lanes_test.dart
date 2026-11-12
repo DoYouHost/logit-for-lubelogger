@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lubelogger_mobile/core/api/api_exceptions.dart';
 import 'package:lubelogger_mobile/core/diagnostics/diagnostics_wiring.dart';
@@ -186,7 +186,10 @@ void main() {
     /// A form the shared shell owns, with one field that always refuses.
     Widget refusingForm(GlobalKey<FormState> key, VoidCallback onSubmit) =>
         MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
           supportedLocales: AppLocalizations.supportedLocales,
           home: logSurface(
             'form.fuel',

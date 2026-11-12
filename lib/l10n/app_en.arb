@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "LubeLogger",
+  "appTitle": "Logit",
   "@appTitle": {
     "description": "Application name, shown in the launcher and title bar."
   },
@@ -16,6 +16,8 @@
 
   "apiKeyExplain": "Generate an API key in LubeLogger under Settings. Recommended: no expiry and scoped access.",
   "apiKeyLabel": "API key",
+  "apiKeyShow": "Show the key",
+  "apiKeyHide": "Hide the key",
 
   "connect": "Connect",
   "connecting": "Connecting…",

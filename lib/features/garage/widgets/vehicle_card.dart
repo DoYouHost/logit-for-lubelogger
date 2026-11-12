@@ -1,11 +1,12 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/format/formatters.dart';
 import '../../../core/models/vehicle_info.dart';
 import '../../../core/settings/units_settings.dart';
 import '../../../core/format/vehicle_units.dart';
 import '../../../core/theme/dash_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/diagnostics/image_probe.dart';
 import '../../common/vehicle_image.dart';
 
@@ -201,17 +202,24 @@ class AddVehicleTile extends StatelessWidget {
     // and the empty garage — are named by this one line.
     return logTag(
       'garage.add',
-      SizedBox(
-        height: 200,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: onTap,
-            child: CustomPaint(
-              painter: _DashedBorderPainter(color: t.subCardBorder, radius: 16),
-              child: Center(
-                child: Icon(Icons.add, size: 44, color: t.accentGold),
+      // The tile is an icon alone, so its name is the action it performs.
+      Semantics(
+        label: AppLocalizations.of(context).formVehicleTitle,
+        child: SizedBox(
+          height: 200,
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onTap,
+              child: CustomPaint(
+                painter: _DashedBorderPainter(
+                  color: t.subCardBorder,
+                  radius: 16,
+                ),
+                child: Center(
+                  child: Icon(Icons.add, size: 44, color: t.accentGold),
+                ),
               ),
             ),
           ),

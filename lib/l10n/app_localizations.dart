@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Application name, shown in the launcher and title bar.
   ///
   /// In en, this message translates to:
-  /// **'LubeLogger'**
+  /// **'Logit'**
   String get appTitle;
 
   /// Title of the login / server setup screen.
@@ -145,6 +145,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'API key'**
   String get apiKeyLabel;
+
+  /// No description provided for @apiKeyShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the key'**
+  String get apiKeyShow;
+
+  /// No description provided for @apiKeyHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the key'**
+  String get apiKeyHide;
 
   /// No description provided for @connect.
   ///
