@@ -59,7 +59,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           backgroundColor: Colors.transparent,
           appBar: dashAppBar(context, title: l10n.connectToServer),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(DashSpace.lg),
+            padding: withSystemNavInset(
+              context,
+              const EdgeInsets.all(DashSpace.lg),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
