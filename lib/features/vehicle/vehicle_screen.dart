@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -76,10 +76,7 @@ class _VehicleScreenState extends ConsumerState<VehicleScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final vehicleId = widget.vehicleId;
-    final vehicle = ref
-        .watch(vehicleInfoProvider(vehicleId))
-        .valueOrNull
-        ?.vehicle;
+    final vehicle = ref.watch(vehicleInfoProvider(vehicleId)).value?.vehicle;
     final visible = ref.watch(visibleTabsProvider);
     final order = ref.watch(tabOrderProvider);
 
@@ -111,23 +108,34 @@ class _VehicleScreenState extends ConsumerState<VehicleScreen>
         backgroundColor: Colors.transparent,
         // On a record tab the FAB adds that tab's record type straight away;
         // the dashboard, or a long press anywhere, opens the full picker.
-        floatingActionButton: GestureDetector(
-          onLongPress: () {
-            Feedback.forLongPress(context);
-            showAddRecordSheet(context, vehicleId, orderedVisible, hidden);
-          },
-          child: FloatingActionButton(
-            backgroundColor: DashTokens.of(context).accentGold,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            onPressed: () => controller.index == 0
-                ? showAddRecordSheet(context, vehicleId, orderedVisible, hidden)
-                : showAddRecordForm(
-                    context,
-                    vehicleId,
-                    orderedVisible[controller.index - 1],
-                  ),
-            child: const Icon(Icons.add),
-          ).tagged('vehicle.add'),
+        // The long press is a node of its own, apart from the button's tap: named
+        // here, outside the detector, it merges into that node.
+        floatingActionButton: Semantics(
+          label: l10n.addRecordTitle,
+          child: GestureDetector(
+            onLongPress: () {
+              Feedback.forLongPress(context);
+              showAddRecordSheet(context, vehicleId, orderedVisible, hidden);
+            },
+            child: FloatingActionButton(
+              tooltip: l10n.addRecordTitle,
+              backgroundColor: DashTokens.of(context).accentGold,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              onPressed: () => controller.index == 0
+                  ? showAddRecordSheet(
+                      context,
+                      vehicleId,
+                      orderedVisible,
+                      hidden,
+                    )
+                  : showAddRecordForm(
+                      context,
+                      vehicleId,
+                      orderedVisible[controller.index - 1],
+                    ),
+              child: const Icon(Icons.add),
+            ).tagged('vehicle.add'),
+          ),
         ),
         body: SafeArea(
           bottom: false,
@@ -243,7 +251,7 @@ class _VehicleHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = DashTokens.of(context);
     final baseUrl = ref.watch(serverProfileProvider)?.baseUrl ?? '';
-    final apiKey = ref.watch(apiKeyProvider).valueOrNull;
+    final apiKey = ref.watch(apiKeyProvider).value;
     final name = vehicle == null
         ? ''
         : [
@@ -264,6 +272,7 @@ class _VehicleHeader extends ConsumerWidget {
       child: Row(
         children: [
           IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(Icons.arrow_back),
             onPressed: () => context.pop(),
           ).tagged('vehicle.back'),
@@ -397,7 +406,7 @@ class _VehicleTabBar extends StatelessWidget {
             logTag(
               'vehicle.tabbar.${tab.id}',
               Tab(
-                height: 44,
+                height: kMinInteractiveDimension,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: DashSpace.md),
                   child: Row(

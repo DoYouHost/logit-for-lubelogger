@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -104,12 +104,10 @@ class _ExtraFieldsFieldState extends ConsumerState<ExtraFieldsField> {
   Widget build(BuildContext context) {
     // Watched, not read at pick time: an unlistened FutureProvider is still
     // loading the first time it's read, which would silently fall back to ISO.
-    _dateFormat = _formatOf(
-      ref.watch(serverInfoProvider).valueOrNull?.dateFormat,
-    );
+    _dateFormat = _formatOf(ref.watch(serverInfoProvider).value?.dateFormat);
     final template = ref
         .watch(extraFieldTemplateProvider(widget.recordType))
-        .valueOrNull;
+        .value;
     if (!_reported || !identical(template, _template)) {
       _reported = true;
       _template = template;

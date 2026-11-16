@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -73,8 +73,8 @@ class _DashboardBody extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final units = ref.watch(vehicleUnitsProvider(vehicleId));
     final symbol = ref.watch(currencySymbolProvider);
-    final stats = ref.watch(gasStatsProvider(vehicleId)).valueOrNull;
-    final timeline = ref.watch(expenseTimelineProvider(vehicleId)).valueOrNull;
+    final stats = ref.watch(gasStatsProvider(vehicleId)).value;
+    final timeline = ref.watch(expenseTimelineProvider(vehicleId)).value;
     final t = DashTokens.of(context);
     final now = DateTime.now();
     // MaterialLocalizations counts from Sunday = 0; DateTime from Monday = 1.
@@ -334,7 +334,7 @@ class _StatBlock extends ConsumerWidget {
 
     final lastOdometerDate = ref
         .watch(lastOdometerDateProvider(info.vehicle.id))
-        .valueOrNull;
+        .value;
 
     final rows = [
       _StatRow(

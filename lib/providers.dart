@@ -5,6 +5,7 @@ import 'package:app_report_client/app_report_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show ProviderOrFamily;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,6 +49,12 @@ import 'core/settings/server_profile.dart';
 import 'core/settings/settings_repository.dart';
 import 'core/settings/units_settings.dart';
 import 'data/vehicles_repository.dart';
+
+/// Riverpod 3 retries a provider that throws an `Exception` up to ten times with
+/// a growing delay. Here a failed read is an answer to show (an error view with a
+/// refresh button), and the HTTP layer has its own retry, so this would hold every
+/// screen on a spinner instead. Every root scope and container passes this.
+Duration? neverRetry(int retryCount, Object error) => null;
 
 /// Overridden in main() after `SharedPreferences.getInstance()`.
 final sharedPreferencesProvider = Provider<SharedPreferences>(
@@ -229,7 +236,7 @@ class TabOrderNotifier extends Notifier<List<VehicleTab>> {
 final currencySymbolProvider = Provider<String>((ref) {
   final forced = ref.watch(unitsSettingsProvider).currency.fixedSymbol;
   if (forced != null) return forced;
-  return ref.watch(serverInfoProvider).valueOrNull?.currencySymbol ?? r'$';
+  return ref.watch(serverInfoProvider).value?.currencySymbol ?? r'$';
 });
 
 /// Bare Dio (no auth) used for the login probe.
@@ -409,7 +416,7 @@ final syncServiceProvider = Provider<SyncService>((ref) {
         ? null
         : PhotoCache(
             baseUrl: profile.baseUrl,
-            apiKey: ref.watch(apiKeyProvider).valueOrNull,
+            apiKey: ref.watch(apiKeyProvider).value,
           ),
   );
 });
@@ -654,7 +661,7 @@ final serverInfoProvider = FutureProvider<ServerInfo>(
 /// loading — see [ServerCapabilities].
 final serverCapabilitiesProvider = Provider<ServerCapabilities>(
   (ref) => ServerCapabilities.forVersion(
-    ref.watch(serverInfoProvider).valueOrNull?.currentVersion ?? '',
+    ref.watch(serverInfoProvider).value?.currentVersion ?? '',
   ),
 );
 
@@ -721,10 +728,7 @@ final vehicleUnitsProvider = Provider.family<VehicleUnits, int>((
   ref,
   vehicleId,
 ) {
-  final vehicle = ref
-      .watch(vehicleInfoProvider(vehicleId))
-      .valueOrNull
-      ?.vehicle;
+  final vehicle = ref.watch(vehicleInfoProvider(vehicleId)).value?.vehicle;
   return VehicleUnits(
     ref.watch(unitsSettingsProvider),
     isElectric: vehicle?.isElectric ?? false,

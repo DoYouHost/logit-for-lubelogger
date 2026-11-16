@@ -24,14 +24,14 @@ class SetupState {
 }
 
 final setupControllerProvider =
-    AutoDisposeNotifierProvider<SetupController, SetupState>(
+    NotifierProvider.autoDispose<SetupController, SetupState>(
       SetupController.new,
     );
 
 /// Drives the login screen: validate input, verify the API key against
 /// `GET /api/whoami`, then persist the profile (which flips the router to the
 /// app — see `router.dart`).
-class SetupController extends AutoDisposeNotifier<SetupState> {
+class SetupController extends Notifier<SetupState> {
   @override
   SetupState build() => const SetupState();
 

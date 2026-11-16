@@ -17,7 +17,7 @@
 # `release-publish`.
 apk := "build/dist/app-release.apk"
 aab := "build/dist/app-release.aab"
-repo := "DoYouHost/lubelogger-mobile"
+repo := "DoYouHost/logit-for-lubelogger"
 
 emulator_bin := "$HOME/Android/Sdk/emulator/emulator"
 # Default local AVD (Pixel 7, API 35). Every local recipe takes an `avd=`
@@ -35,6 +35,16 @@ default:
 [group('1-develop')]
 test:
     flutter test
+
+# Every screen of the app on the demo server, in both themes and at 150 / 200 %
+# text, held to Flutter's contrast, tap-target and label guidelines. One run with
+# the parallelism inside it: several `flutter test` processes share build/test_cache
+# and corrupt it. See docs/a11y-guideline-tests.md.
+# usage: just test-a11y [FILES…]
+[doc('run the rendered accessibility suite')]
+[group('1-develop')]
+test-a11y *files='test/a11y':
+    systemd-run --user --scope -q -p MemoryMax=12G -p MemorySwapMax=0 -p RuntimeMaxSec=1800 flutter test --concurrency=4 {{files}}
 
 # Compare .arb files against the English template: find missing, outdated or mismatched keys.
 # usage: just l10n-status [*ARGS]
@@ -235,7 +245,7 @@ clean:
 # leave a published release with nothing to promote.
 
 # A release is cut from whatever is checked out: `_bump` commits here and
-# `release-publish` pushes here. `ship` insists on `release/X.Y.Z`, so main and
+# `release-publish` pushes here. `ship` insists on `release/X.Y.Z`, so master and
 # dev never receive a bump directly. One definition for both, because a bump
 # landing on a different branch than the push would publish a release without its
 # own version commit.
@@ -261,25 +271,25 @@ _require-release-branch ver:
         exit 1
     fi
 
-# Opens the draft PR into main for release/<ver>; a no-op when one is open.
-# Fails when the branch has no commit over main — `release-start` tolerates
+# Opens the draft PR into master for release/<ver>; a no-op when one is open.
+# Fails when the branch has no commit over master — `release-start` tolerates
 # that (the bump commit is still to come), `release-publish` cannot.
 [no-exit-message]
 _release-pr ver:
     #!/usr/bin/env bash
     set -euo pipefail
     branch="release/{{ver}}"
-    open=$(gh pr list --repo {{repo}} --base main --head "$branch" --state open --json number --jq '.[0].number // empty')
+    open=$(gh pr list --repo {{repo}} --base master --head "$branch" --state open --json number --jq '.[0].number // empty')
     if [ -n "$open" ]; then
         echo "PR #$open already open for $branch"
         exit 0
     fi
-    gh pr create --repo {{repo}} --base main --head "$branch" --draft \
+    gh pr create --repo {{repo}} --base master --head "$branch" --draft \
         --title "chore: release {{ver}}" \
-        --body "Release {{ver}}: merges release/{{ver}} into main."
+        --body "Release {{ver}}: merges release/{{ver}} into master."
 
 # Cuts release/<ver> from <base> (default: the pushed tip of dev; a SHA or
-# origin/main for a hotfix works too), pushes it and opens its draft PR, so CI
+# origin/master for a hotfix works too), pushes it and opens its draft PR, so CI
 # runs on every change that is merged into the release from then on.
 # usage: just release-start X.Y.Z [BASE]
 [doc('cut release/X.Y.Z, push it and open its draft PR')]
@@ -301,7 +311,7 @@ release-start ver base='origin/dev':
     fi
     git switch --no-track -c "$branch" {{ quote(base) }}
     git push -u origin "$branch"
-    just _release-pr {{ver}} || echo "No PR yet (nothing ahead of main?); \`just ship {{ver}}\` opens it."
+    just _release-pr {{ver}} || echo "No PR yet (nothing ahead of master?); \`just ship {{ver}}\` opens it."
 
 # versionCode = (major*10000 + minor*100 + patch) * 1000 (e.g. 1.2.3 → 10203000)
 # The trailing three zeros are the dev slots: `ship-dev` numbers the builds
@@ -550,7 +560,7 @@ release-publish ver:
     # and immediately reference it before the server has indexed it.
     git push origin "HEAD:refs/heads/$branch"
     # Normally opened by `release-start`; this covers a branch cut when it had
-    # nothing ahead of main, and a PR closed by hand.
+    # nothing ahead of master, and a PR closed by hand.
     just _release-pr {{ver}}
     # Skip creating the release if it already exists (e.g. a previous run got
     # this far before failing), so the pipeline can be resumed safely.

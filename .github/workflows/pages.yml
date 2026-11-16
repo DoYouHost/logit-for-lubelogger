@@ -1,6 +1,6 @@
 name: Pages
 
-# The landing page and the privacy policy. They ship from `site/` on main, so a
+# The landing page and the privacy policy. They ship from `site/` on master, so a
 # policy change is a normal commit reviewed alongside the code it describes,
 # rather than a second branch to remember. The privacy policy URL below is
 # registered in the Play Console — treat a broken deploy here as a live-listing
@@ -14,7 +14,7 @@ name: Pages
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "site/**"
       - ".github/workflows/pages.yml"

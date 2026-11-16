@@ -1,6 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
-import '../../../core/diagnostics/log_form.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../common/confirm_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_diagnostics/app_diagnostics.dart';
@@ -18,6 +17,7 @@ import '../../../providers.dart';
 import 'attachments_field.dart';
 import 'extra_fields_field.dart';
 import 'form_fields.dart';
+import 'record_form_scaffold.dart';
 
 /// Opens the "Add fuel record" form as a modal bottom sheet. Pass [existing] to
 /// edit that record instead (prefilled, with a delete option). Resolves to
@@ -167,165 +167,87 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
     final t = DashTokens.of(context);
     final units = ref.watch(vehicleUnitsProvider(widget.vehicleId));
 
-    return Padding(
-      // Lift the sheet above the keyboard.
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          DashSpace.xl,
-          DashSpace.xs,
-          DashSpace.xl,
-          DashSpace.xl,
+    return RecordFormScaffold(
+      formKey: _formKey,
+      title: _isEditing ? l10n.formFuelEditTitle : l10n.formFuelTitle,
+      isEditing: _isEditing,
+      submitting: _submitting,
+      onCancel: () => Navigator.pop(context),
+      onSubmit: _submit,
+      onDelete: _isEditing ? _confirmDelete : null,
+      error: _error,
+      fields: [
+        DateField(
+          text: units.formatDate(_date),
+          onPick: _submitting ? null : _pickDate,
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _isEditing ? l10n.formFuelEditTitle : l10n.formFuelTitle,
-                      style: TextStyle(
-                        fontFamily: DashTokens.fontUi,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: t.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (_isEditing)
-                    IconButton(
-                      icon: Icon(Icons.delete_outline, color: t.dangerInk),
-                      onPressed: _submitting ? null : _confirmDelete,
-                    ).tagged('form.delete'),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: _submitting
-                        ? null
-                        : () => Navigator.pop(context),
-                  ).tagged('form.close'),
-                ],
-              ),
-              const SizedBox(height: DashSpace.sm),
-              DateField(
-                text: units.formatDate(_date),
-                onPick: _submitting ? null : _pickDate,
-              ),
-              const SizedBox(height: DashSpace.lg),
-              _numberField(
-                controller: _odometer,
-                label: l10n.formOdometerLabel(units.distanceLabel),
-                decimal: false,
-              ),
-              for (final field in _order) ...[
-                const SizedBox(height: DashSpace.lg),
-                _linkedField(field, units, l10n),
-              ],
-              // Electric only, like the web's dual-range slider: the server
-              // reads state of charge for no other kind of vehicle.
-              if (units.isElectric) ...[
-                const SizedBox(height: DashSpace.lg),
-                _SocField(
-                  values: _soc,
-                  enabled: !_submitting,
-                  onChanged: (v) => setState(() => _soc = v),
-                ),
-              ],
-              const SizedBox(height: DashSpace.sm),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.formFillToFull),
-                value: _fillToFull,
-                // A missed fuel-up has no meaningful "filled to full" state.
-                onChanged: _submitting || _missedFuelUp
-                    ? null
-                    : (v) => setState(() => _fillToFull = v),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(l10n.formMissedFuelUp),
-                value: _missedFuelUp,
-                onChanged: _submitting
-                    ? null
-                    : (v) => setState(() => _missedFuelUp = v ?? false),
-              ),
-              const SizedBox(height: DashSpace.lg),
-              TextFormField(
-                controller: _tags,
-                enabled: !_submitting,
-                decoration: dashFieldDecoration(
-                  t,
-                  labelText: l10n.formTagsOptional,
-                ),
-              ),
-              const SizedBox(height: DashSpace.lg),
-              TextFormField(
-                controller: _notes,
-                enabled: !_submitting,
-                minLines: 2,
-                maxLines: 4,
-                decoration: dashFieldDecoration(
-                  t,
-                  labelText: l10n.formNotesOptional,
-                ),
-              ),
-              const SizedBox(height: DashSpace.lg),
-              ExtraFieldsField(
-                recordType: ExtraFieldRecordType.gas,
-                initial: _extraFields,
-                enabled: !_submitting,
-                onChanged: (fields) => _extraFields = fields,
-              ),
-              const SizedBox(height: DashSpace.lg),
-              AttachmentsField(
-                initial: _files,
-                enabled: !_submitting,
-                onChanged: (files) => _files = files,
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: DashSpace.md),
-                Text(
-                  _error!,
-                  style: TextStyle(
-                    color: t.dangerInk,
-                    fontFamily: DashTokens.fontUi,
-                  ),
-                ),
-              ],
-              const SizedBox(height: DashSpace.xl),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _submitting
-                          ? null
-                          : () => Navigator.pop(context),
-                      child: Text(l10n.actionCancel),
-                    ).tagged('form.cancel'),
-                  ),
-                  const SizedBox(width: DashSpace.md),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _submitting ? null : _submit,
-                      child: _submitting
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(_isEditing ? l10n.actionSave : l10n.actionAdd),
-                    ).tagged('form.submit'),
-                  ),
-                ],
-              ),
-            ],
+        const SizedBox(height: DashSpace.lg),
+        _numberField(
+          controller: _odometer,
+          label: l10n.formOdometerLabel(units.distanceLabel),
+          decimal: false,
+        ),
+        for (final field in _order) ...[
+          const SizedBox(height: DashSpace.lg),
+          _linkedField(field, units, l10n),
+        ],
+        // Electric only, like the web's dual-range slider: the server
+        // reads state of charge for no other kind of vehicle.
+        if (units.isElectric) ...[
+          const SizedBox(height: DashSpace.lg),
+          _SocField(
+            values: _soc,
+            enabled: !_submitting,
+            onChanged: (v) => setState(() => _soc = v),
           ),
+        ],
+        const SizedBox(height: DashSpace.sm),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.formFillToFull),
+          value: _fillToFull,
+          // A missed fuel-up has no meaningful "filled to full" state.
+          onChanged: _submitting || _missedFuelUp
+              ? null
+              : (v) => setState(() => _fillToFull = v),
         ),
-      ),
+        CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text(l10n.formMissedFuelUp),
+          value: _missedFuelUp,
+          onChanged: _submitting
+              ? null
+              : (v) => setState(() => _missedFuelUp = v ?? false),
+        ),
+        const SizedBox(height: DashSpace.lg),
+        TextFormField(
+          controller: _tags,
+          enabled: !_submitting,
+          decoration: dashFieldDecoration(t, labelText: l10n.formTagsOptional),
+        ),
+        const SizedBox(height: DashSpace.lg),
+        TextFormField(
+          controller: _notes,
+          enabled: !_submitting,
+          minLines: 2,
+          maxLines: 4,
+          decoration: dashFieldDecoration(t, labelText: l10n.formNotesOptional),
+        ),
+        const SizedBox(height: DashSpace.lg),
+        ExtraFieldsField(
+          recordType: ExtraFieldRecordType.gas,
+          initial: _extraFields,
+          enabled: !_submitting,
+          onChanged: (fields) => _extraFields = fields,
+        ),
+        const SizedBox(height: DashSpace.lg),
+        AttachmentsField(
+          initial: _files,
+          enabled: !_submitting,
+          onChanged: (files) => _files = files,
+        ),
+      ],
     );
   }
 
@@ -414,7 +336,7 @@ class _AddFuelFormState extends ConsumerState<_AddFuelForm> {
   }
 
   Future<void> _submit() async {
-    if (!validateAndLog(context, _formKey)) return;
+    if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     setState(() {

@@ -1,6 +1,6 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:app_report_ui/app_report_ui.dart' show bugReportRoute;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
@@ -66,7 +66,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen>
     final l10n = AppLocalizations.of(context);
     final garage = ref.watch(garageProvider);
     final baseUrl = ref.watch(serverProfileProvider)?.baseUrl ?? '';
-    final apiKey = ref.watch(apiKeyProvider).valueOrNull;
+    final apiKey = ref.watch(apiKeyProvider).value;
     final currency = ref.watch(currencySymbolProvider);
     final units = ref.watch(unitsSettingsProvider);
 
@@ -80,7 +80,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen>
           backgroundColor: Colors.transparent,
           appBar: dashAppBar(
             context,
-            titleWidget: const LubeLoggerWordmark(),
+            titleWidget: const AppWordmark(),
             actions: [
               const SyncStatusAction(),
               // On the home screen rather than only in settings: a bug is
@@ -144,29 +144,35 @@ class _GarageScreenState extends ConsumerState<GarageScreen>
                             // card stays within its own column instead of
                             // bleeding over the neighbouring vehicle.
                             return ClipRect(
-                              child: Slidable(
-                                key: ValueKey(info.vehicle.id),
-                                controller: _controllerFor(info.vehicle.id),
-                                endActionPane: ActionPane(
-                                  motion: const DrawerMotion(),
-                                  extentRatio: 0.3,
-                                  children: [
-                                    _EditVehicleAction(
-                                      onPressed: () =>
-                                          _editVehicle(info.vehicle),
-                                    ),
-                                  ],
-                                ),
-                                child: logTag(
-                                  'garage.card',
-                                  VehicleCard(
-                                    info: info,
-                                    baseUrl: baseUrl,
-                                    apiKey: apiKey,
-                                    currencySymbol: currency,
-                                    units: units,
-                                    onTap: () => context.push(
-                                      '/vehicle/${info.vehicle.id}',
+                              // While another card is open, every card gets a tap that
+                              // closes it, from inside `flutter_slidable`: it has no
+                              // name of its own, so the card's is given from outside.
+                              child: Semantics(
+                                label: info.vehicle.makeModel,
+                                child: Slidable(
+                                  key: ValueKey(info.vehicle.id),
+                                  controller: _controllerFor(info.vehicle.id),
+                                  endActionPane: ActionPane(
+                                    motion: const DrawerMotion(),
+                                    extentRatio: 0.3,
+                                    children: [
+                                      _EditVehicleAction(
+                                        onPressed: () =>
+                                            _editVehicle(info.vehicle),
+                                      ),
+                                    ],
+                                  ),
+                                  child: logTag(
+                                    'garage.card',
+                                    VehicleCard(
+                                      info: info,
+                                      baseUrl: baseUrl,
+                                      apiKey: apiKey,
+                                      currencySymbol: currency,
+                                      units: units,
+                                      onTap: () => context.push(
+                                        '/vehicle/${info.vehicle.id}',
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -239,48 +245,55 @@ class _EditVehicleAction extends StatelessWidget {
       onPressed: (_) => onPressed(),
       backgroundColor: Colors.transparent,
       padding: EdgeInsets.zero,
-      child: logTag(
-        'garage.edit',
-        SizedBox.expand(
-          child: Container(
-            margin: const EdgeInsets.only(left: DashSpace.md),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [t.accentGold, t.accentOrange],
+      // The button is the node that takes the tap, so it takes the name: a label
+      // outside the tag merges into it, and the text under the tag is not read again.
+      child: Semantics(
+        label: l10n.actionEdit,
+        child: logTag(
+          'garage.edit',
+          ExcludeSemantics(
+            child: SizedBox.expand(
+              child: Container(
+                margin: const EdgeInsets.only(left: DashSpace.md),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [t.accentGold, t.accentOrange],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: t.accentGold.withValues(alpha: 0.45),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(DashSpace.sm),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.24),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.edit_rounded, size: 22, color: ink),
+                    ),
+                    const SizedBox(height: DashSpace.sm),
+                    Text(
+                      l10n.actionEdit,
+                      style: TextStyle(
+                        fontFamily: DashTokens.fontUi,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: ink,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: t.accentGold.withValues(alpha: 0.45),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(DashSpace.sm),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.24),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.edit_rounded, size: 22, color: ink),
-                ),
-                const SizedBox(height: DashSpace.sm),
-                Text(
-                  l10n.actionEdit,
-                  style: TextStyle(
-                    fontFamily: DashTokens.fontUi,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: ink,
-                  ),
-                ),
-              ],
             ),
           ),
         ),

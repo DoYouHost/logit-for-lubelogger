@@ -1,5 +1,5 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/dash_theme.dart';
 import '../../../l10n/app_localizations.dart';
@@ -239,35 +239,46 @@ class RecordTagChip extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DashSpace.sm,
-          vertical: DashSpace.xs,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minWidth: kMinInteractiveDimension,
+          minHeight: kMinInteractiveDimension,
         ),
-        decoration: BoxDecoration(
-          color: accent.withValues(alpha: selected ? 0.22 : 0.10),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: accent.withValues(alpha: selected ? 0.6 : 0.25),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              tag,
-              style: TextStyle(
-                fontFamily: DashTokens.fontUi,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: accent,
+        child: Center(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DashSpace.sm,
+              vertical: DashSpace.xs,
+            ),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: selected ? 0.22 : 0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: accent.withValues(alpha: selected ? 0.6 : 0.25),
               ),
             ),
-            if (selected) ...[
-              const SizedBox(width: DashSpace.xs),
-              Icon(Icons.close, size: 12, color: accent),
-            ],
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tag,
+                  style: TextStyle(
+                    fontFamily: DashTokens.fontUi,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    // In the light theme the blue ink is 4.1:1 on the selected wash, under 4.5:1.
+                    color: selected ? t.textPrimary : t.accentBlueInk,
+                  ),
+                ),
+                if (selected) ...[
+                  const SizedBox(width: DashSpace.xs),
+                  Icon(Icons.close, size: 12, color: t.accentBlueInk),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );

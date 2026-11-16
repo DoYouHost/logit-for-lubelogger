@@ -7,13 +7,13 @@ LubeLogger.
 
 ## CI is the answer to most questions
 
-Every pull request into `main` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
+Every pull request into `master` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
 `flutter pub get --enforce-lockfile`, `dart format --output=none
 --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test` and a debug
 APK compile. A pull request that touches only `docs/`, `site/`, `reference/` or
 `*.md` skips everything after the path check and still reports green. It runs on
 GitHub-hosted runners as parallel jobs (analyze, test, build) behind one
-`analyze · test · build` job, the status `main` requires. The pull request is
+`analyze · test · build` job, the status `master` requires. The pull request is
 opened as a draft by `just release-start`, so CI runs on every push to
 `release/X.Y.Z` through it; there is no `push` trigger, which would run it twice.
 A pull request into `dev` gets the same run, but nothing there requires it, and a
@@ -108,12 +108,15 @@ inside an unrelated change and do not stay silent.
 - [docs/diagnostics.md](docs/diagnostics.md) — the bug-report log, the relay
   contract and the redaction rules that are easy to break. **Read it before adding a
   log field, a control or a report path.**
+- [docs/a11y-guideline-tests.md](docs/a11y-guideline-tests.md) — the rendered accessibility
+  suite (`just test-a11y`): what it covers, what it does not and why, how the harness
+  measures. **Read it before touching `test/a11y/` or fixing a guideline finding.**
 - [docs/performance.md](docs/performance.md) — measuring before claiming, and the
   scroll benchmark harness.
-- [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `main`:
+- [docs/branching.md](docs/branching.md) — topic → `dev` → `release/X.Y.Z` → `master`:
   what each branch is for, how a release is cut and merged, why a release PR is never
-  squashed and why `main` goes back into `dev`. **Read it before opening a PR into
-  `main` or running `ship`.**
+  squashed and why `master` goes back into `dev`. **Read it before opening a PR into
+  `master` or running `ship`.**
 - [docs/release.md](docs/release.md) — `ship`, `ship-dev`, the version-code scheme,
   R8 and resource-shrinking traps that only show in a release build. **Read it
   before touching a recipe, the proguard rules or adding a plugin.**
@@ -150,6 +153,16 @@ inside an unrelated change and do not stay silent.
 - **Release only through `just ship` / `just ship-dev`**, a stable one from
   `release/X.Y.Z` cut by `just release-start` ([docs/branching.md](docs/branching.md)).
   Never push a tag by hand and never change `applicationId`.
+- **UI and state packages:** screens import `package:material_ui/material_ui.dart`,
+  never `flutter/material.dart` (the shared design system returns its types), and
+  Material's localizations come from `GlobalMaterialLocalizations.delegates`, never
+  from the generated `AppLocalizations.localizationsDelegates` (a `material_ui`
+  widget finds no `MaterialLocalizations` from it, and nothing says so until
+  runtime). `flutter_riverpod` is at 3: `value` not `valueOrNull`, one `Notifier` base
+  with `.autoDispose` on the provider, `Override` and `ProviderOrFamily` from
+  `flutter_riverpod/misc.dart`, and `neverRetry` (in `providers.dart`) passed to every
+  root `ProviderScope` and container in `lib/`, and to any test that reads a provider
+  it expects to fail (a retry holds it on `AsyncLoading`).
 - **Bump every `app-shared` ref together**; `app_report_client` must match the ref
   `app_diagnostics` names ([docs/shared-packages.md](docs/shared-packages.md)).
 - **Diagnostics:** `relayBaseUrl` must not end in a slash; every new log field with

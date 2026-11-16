@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/format/formatters.dart';
@@ -250,7 +250,7 @@ class FuelTab extends ConsumerWidget {
     final units = ref.watch(vehicleUnitsProvider(vehicleId));
     final symbol = ref.watch(currencySymbolProvider);
     final async = ref.watch(gasRecordsProvider(vehicleId));
-    final stats = ref.watch(gasStatsProvider(vehicleId)).valueOrNull;
+    final stats = ref.watch(gasStatsProvider(vehicleId)).value;
 
     String econ(double? rawRatio) {
       if (rawRatio == null) return _placeholder;
@@ -340,6 +340,7 @@ class FuelTab extends ConsumerWidget {
               DashPill(
                 label: l10n.fuelPillAvg(econLabel(avgDisplayed)),
                 accent: t.accentBlue,
+                accentInk: t.accentBlueInk,
               ),
               if (economies.isNotEmpty) ...[
                 DashPill(
@@ -347,12 +348,14 @@ class FuelTab extends ConsumerWidget {
                     econLabel(economies.reduce((a, b) => a < b ? a : b)),
                   ),
                   accent: t.accentBlue,
+                  accentInk: t.accentBlueInk,
                 ),
                 DashPill(
                   label: l10n.fuelPillMax(
                     econLabel(economies.reduce((a, b) => a > b ? a : b)),
                   ),
                   accent: t.accentBlue,
+                  accentInk: t.accentBlueInk,
                 ),
               ],
               if (stats != null)
