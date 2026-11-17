@@ -125,11 +125,14 @@ class _GarageScreenState extends ConsumerState<GarageScreen>
                   child: CustomScrollView(
                     slivers: [
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(
-                          DashSpace.lg,
-                          DashSpace.lg,
-                          DashSpace.lg,
-                          DashSpace.xxl,
+                        padding: withSystemNavInset(
+                          context,
+                          const EdgeInsets.fromLTRB(
+                            DashSpace.lg,
+                            DashSpace.lg,
+                            DashSpace.lg,
+                            DashSpace.xxl,
+                          ),
                         ),
                         sliver: SliverResponsiveCards(
                           spacing: DashSpace.lg,
@@ -313,11 +316,14 @@ class _EmptyGarage extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = DashTokens.of(context);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        DashSpace.lg,
-        DashSpace.xxl,
-        DashSpace.lg,
-        DashSpace.xxl,
+      padding: withSystemNavInset(
+        context,
+        const EdgeInsets.fromLTRB(
+          DashSpace.lg,
+          DashSpace.xxl,
+          DashSpace.lg,
+          DashSpace.xxl,
+        ),
       ),
       children: [
         Icon(Icons.garage_outlined, size: 56, color: t.textTertiary),
