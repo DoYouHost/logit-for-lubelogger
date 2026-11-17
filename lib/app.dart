@@ -1,4 +1,5 @@
 import 'package:app_report_ui/app_report_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,8 +16,8 @@ class LubeLoggerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       title: 'Logit',
-      theme: buildDashThemeData(Brightness.light, brand: lubeLoggerBrand),
-      darkTheme: buildDashThemeData(Brightness.dark, brand: lubeLoggerBrand),
+      theme: buildLogitTheme(Brightness.light),
+      darkTheme: buildLogitTheme(Brightness.dark),
       // Follow the system setting; the design is dark-first.
       themeMode: ThemeMode.system,
       // Locale auto-detected from the system; en is the fallback.
@@ -31,10 +32,14 @@ class LubeLoggerApp extends ConsumerWidget {
       // the offline write queue (see SyncHost), and the diagnostic recording
       // controls, which have to outlive the report screen — the bug is
       // reproduced somewhere else in the app.
-      builder: (context, child) => QuickActionHandler(
-        child: SyncHost(
-          child: RecordingBannerScaffold(
-            child: child ?? const SizedBox.shrink(),
+      // The overlay region covers screens that have no app bar to set it.
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: logitSystemOverlay(Theme.brightnessOf(context)),
+        child: QuickActionHandler(
+          child: SyncHost(
+            child: RecordingBannerScaffold(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         ),
       ),

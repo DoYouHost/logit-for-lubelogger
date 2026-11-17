@@ -94,4 +94,33 @@ void main() {
 
     semantics.dispose();
   });
+
+  // Android 15 draws behind the navigation bar. The list's last row used to
+  // end under it, so with three-button navigation the add tile was half hidden.
+  testWidgets('the last row clears the system navigation bar', (tester) async {
+    const navBar = 120.0;
+    tester.view.viewPadding = FakeViewPadding(
+      bottom: navBar * tester.view.devicePixelRatio,
+    );
+    tester.view.padding = tester.view.viewPadding;
+    addTearDown(tester.view.resetPadding);
+    addTearDown(tester.view.resetViewPadding);
+
+    // Enough vehicles that the list scrolls on the test screen.
+    await pumpGarage(tester, [for (var i = 1; i <= 12; i++) vehicle(i)]);
+    await tester.scrollUntilVisible(
+      find.byType(AddVehicleTile),
+      600,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -2000));
+    await tester.pumpAndSettle();
+
+    final screenBottom =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(
+      tester.getBottomLeft(find.byType(AddVehicleTile)).dy,
+      lessThanOrEqualTo(screenBottom - navBar),
+    );
+  });
 }

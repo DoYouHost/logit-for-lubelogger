@@ -49,11 +49,14 @@ class SettingsScreen extends ConsumerWidget {
         body: MaxContentWidth(
           maxWidth: kContentMaxWidth,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              DashSpace.lg,
-              DashSpace.sm,
-              DashSpace.lg,
-              DashSpace.xxl,
+            padding: withSystemNavInset(
+              context,
+              const EdgeInsets.fromLTRB(
+                DashSpace.lg,
+                DashSpace.sm,
+                DashSpace.lg,
+                DashSpace.xxl,
+              ),
             ),
             children: [
               _Section(
