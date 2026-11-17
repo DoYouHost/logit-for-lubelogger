@@ -120,10 +120,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// A field of the request body; the wire format is a string, `50.0`.
-  double sent(_CapturingAdapter adapter, String key) => double.parse(
-    (adapter.captured!.data as Map<String, dynamic>)[key] as String,
-  );
+  /// A decimal field of the request body; on the wire it is a JSON number.
+  double sent(_CapturingAdapter adapter, String key) =>
+      ((adapter.captured!.data as Map<String, dynamic>)[key] as num).toDouble();
 
   bool enabled(WidgetTester tester, String label) =>
       tester.widget<TextFormField>(field(label)).enabled;
