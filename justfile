@@ -46,6 +46,14 @@ test:
 test-a11y *files='test/a11y':
     systemd-run --user --scope -q -p MemoryMax=12G -p MemorySwapMax=0 -p RuntimeMaxSec=1800 flutter test --concurrency=4 {{files}}
 
+# Starts a LubeLogger container per version x locale and runs test/contract on
+# each; needs Docker and network for the first pull. Locale "-" is the server's
+# default. usage: just test-contract [--versions "v1.7.0 latest"] [--locales "- en-US de-DE pl-PL"]
+[doc('run the contract tests against real LubeLogger containers')]
+[group('1-develop')]
+test-contract *args:
+    tool/contract.sh {{args}}
+
 # Compare .arb files against the English template: find missing, outdated or mismatched keys.
 # usage: just l10n-status [*ARGS]
 [doc('check translation status and missing keys against app_en.arb')]

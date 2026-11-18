@@ -1,6 +1,6 @@
 name: CI
 
-# What `just test` plus a compile would tell you locally.
+# What `just test`, `just test-contract` plus a compile would tell you locally.
 # @claude reads this run before asking a question.
 # GitHub-hosted runners: free for a public repo, one VM per job, no shared CPU.
 
@@ -158,11 +158,37 @@ jobs:
       - name: Compile check
         run: flutter build apk --debug --target-platform android-arm64
 
+  # The app against a real LubeLogger per server version, on the default locale, en-US,
+  # de-DE and pl-PL (a decimal-comma server reads a "." decimal string wrongly, #30).
+  # Pinned tags only: `latest` moves, so a red run there would block a pull request
+  # for a change nobody made; check it by hand with `just test-contract`.
+  contract:
+    name: contract (${{ matrix.version }})
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [v1.6.9, v1.7.0, v1.7.4]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: tool/contract.sh --versions "${{ matrix.version }}"
+
   # The one status master requires. A skipped job (docs-only change) counts as
   # passed; a failed or cancelled one does not.
   check:
     name: analyze · test · build
-    needs: [changes, analyze, test, build]
+    needs: [changes, analyze, test, build, contract]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -185,10 +185,9 @@ class VehiclesRepository {
     return parseJsonList(res.data, GasRecord.fromJson);
   });
 
-  /// `POST /api/vehicle/gasrecords/add?vehicleId=` → add a refuel. All fields go
-  /// out as strings (the server string-parses them; our `culture-invariant`
-  /// header makes that parse locale-independent, so `.` decimals and ISO dates
-  /// are safe). Throws [ApiException] when the server reports `success: false`.
+  /// `POST /api/vehicle/gasrecords/add?vehicleId=` → add a refuel. Decimals go
+  /// out as JSON numbers, the rest as strings (see the note above `_gasRecordBody`).
+  /// Throws [ApiException] when the server reports `success: false`.
   Future<void> addGasRecord({
     required int vehicleId,
     required DateTime date,
@@ -295,8 +294,8 @@ class VehiclesRepository {
   /// `POST {kind}/add?vehicleId=` → add a generic (service / repair / upgrade /
   /// tax) record. The server requires date, description and cost — plus
   /// odometer for the odometer-bearing kinds; pass [odometer] as null for tax so
-  /// it's omitted. Values go out as strings (odometer as a whole number for the
-  /// server's `int.Parse`, cost as a plain `.`-decimal).
+  /// it's omitted. Odometer goes out as a whole-number string for the server's
+  /// `int.Parse`, cost as a JSON number (see the note above `_gasRecordBody`).
   Future<void> addRecord({
     required RecordKind kind,
     required int vehicleId,
@@ -839,8 +838,16 @@ class VehiclesRepository {
   List<Vehicle> _parseVehicles(List<dynamic>? data) =>
       parseJsonList(data, Vehicle.fromJson);
 
-  /// Shared field set for a gas record write (add or update); all values go out
-  /// as strings, per the server's string-parsed export model.
+  // Decimals as JSON numbers: `cost`, `fuelConsumed` and `partQuantity` are
+  // string properties the server reads with `decimal.Parse` under ITS culture,
+  // and `culture-invariant` only governs responses. A "174.9" string is 1749 on a
+  // server set to de-DE or pl-PL (the `.` is a thousands separator there). A JSON
+  // number is turned into text and parsed back by the same culture, so it
+  // survives any locale (docs.lubelogger.com: "Post bodies in JSON if you wish to
+  // pass in numbers"). Held by test/contract on 1.6.9 to latest, default and de-DE.
+  /// Shared field set for a gas record write (add or update). Decimals are JSON
+  /// numbers (see the note above `_gasRecordBody`); everything else a string, per the
+  /// server's string-parsed export model.
   ///
   /// `startingSoc`/`endingSoc` are always sent, never left empty: before
   /// LubeLogger 1.7.0 the server `int.Parse`d them with no guard, so an absent
@@ -861,8 +868,8 @@ class VehiclesRepository {
   }) => {
     'date': calendarDateToJson(date),
     'odometer': _intString(odometer),
-    'fuelConsumed': fuelConsumed.toString(),
-    'cost': cost.toString(),
+    'fuelConsumed': fuelConsumed,
+    'cost': cost,
     'isFillToFull': isFillToFull.toString(),
     'missedFuelUp': missedFuelUp.toString(),
     'startingSoc': startingSoc.toString(),
@@ -875,7 +882,7 @@ class VehiclesRepository {
 
   /// Shared field set for a generic record write (add or update). Odometer is
   /// omitted when null (tax records have none); it goes out as a whole-number
-  /// string for the server's `int.Parse`, cost as a plain `.`-decimal.
+  /// string for the server's `int.Parse`, cost as a JSON number.
   static Map<String, dynamic> _recordBody({
     required DateTime date,
     required String description,
@@ -889,7 +896,7 @@ class VehiclesRepository {
     'date': calendarDateToJson(date),
     if (odometer != null) 'odometer': _intString(odometer),
     'description': description,
-    'cost': cost.toString(),
+    'cost': cost,
     'notes': notes,
     'tags': tags,
     'files': _filesJson(files),
@@ -914,8 +921,8 @@ class VehiclesRepository {
     'description': description,
     'partNumber': partNumber,
     'partSupplier': partSupplier,
-    'partQuantity': partQuantity.toString(),
-    'cost': cost.toString(),
+    'partQuantity': partQuantity,
+    'cost': cost,
     'notes': notes,
     'tags': tags,
     'files': _filesJson(files),
@@ -935,7 +942,7 @@ class VehiclesRepository {
     List<ExtraField> extraFields,
   ) => {
     'description': description,
-    'cost': cost.toString(),
+    'cost': cost,
     'type': type.wireName,
     'priority': priority.wireName,
     'progress': progress.wireName,
