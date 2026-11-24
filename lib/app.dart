@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/app_localizations_loader.dart';
 import 'core/theme/dash_theme.dart';
 import 'features/quick_actions/quick_action_handler.dart';
 import 'features/sync/sync_host.dart';
@@ -20,13 +21,14 @@ class LubeLoggerApp extends ConsumerWidget {
       darkTheme: buildLogitTheme(Brightness.dark),
       // Follow the system setting; the design is dark-first.
       themeMode: ThemeMode.system,
-      // Locale auto-detected from the system; en is the fallback.
+      // Locale auto-detected from the system; en is the fallback (it is first
+      // in appSupportedLocales).
       localizationsDelegates: [
         AppLocalizations.delegate,
         ...GlobalMaterialLocalizations.delegates,
         ReportLocalizations.delegate,
       ],
-      supportedLocales: AppLocalizations.supportedLocales,
+      supportedLocales: appSupportedLocales,
       routerConfig: ref.watch(routerProvider),
       // Always-mounted hosts: launcher quick actions (see QuickActionHandler),
       // the offline write queue (see SyncHost), and the diagnostic recording
