@@ -14,7 +14,7 @@
   "apiKeyHide": "Schlüssel verbergen",
 
   "connect": "Verbinden",
-  "connecting": "Verbindung wird hergestellt…",
+  "connecting": "Verbinde…",
   "tryDemo": "Demo ausprobieren",
   "logout": "Abmelden",
   "retry": "Erneut versuchen",
@@ -225,8 +225,8 @@
   "formStateOfCharge": "Ladestand",
   "formStateOfChargeRange": "{start} % → {end} %",
 
-  "quickActionAddFuel": "Tanken hinzufügen",
-  "quickActionAddOdometer": "Kilometerstand hinzufügen",
+  "quickActionAddFuel": "Tanken erfassen",
+  "quickActionAddOdometer": "Kilometer erfassen",
   "quickActionSelectVehicle": "Fahrzeug auswählen",
 
   "actionCancel": "Abbrechen",

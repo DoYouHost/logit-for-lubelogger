@@ -656,7 +656,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String formFuelLabel(String unit) {
-    return 'Carburant consommé ($unit)';
+    return 'Quantité de carburant ($unit)';
   }
 
   @override

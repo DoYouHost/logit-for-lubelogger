@@ -206,7 +206,7 @@
   "formOdometerBackwardsTitle": "Le relevé recule",
   "formOdometerBackwardsMessage": "Ce relevé est inférieur au dernier ({value}). Un compteur ne fait normalement qu’augmenter. L’enregistrer quand même ?",
   "actionSaveAnyway": "Enregistrer quand même",
-  "formFuelLabel": "Carburant consommé ({unit})",
+  "formFuelLabel": "Quantité de carburant ({unit})",
   "formFuelPriceLabel": "Prix du carburant (par {unit})",
   "formEnergyPriceLabel": "Prix de l’énergie (par {unit})",
   "formFillToFull": "Plein complet",

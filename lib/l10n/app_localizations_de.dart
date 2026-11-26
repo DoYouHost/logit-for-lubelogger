@@ -45,7 +45,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connect => 'Verbinden';
 
   @override
-  String get connecting => 'Verbindung wird hergestellt…';
+  String get connecting => 'Verbinde…';
 
   @override
   String get tryDemo => 'Demo ausprobieren';
@@ -718,10 +718,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get quickActionAddFuel => 'Tanken hinzufügen';
+  String get quickActionAddFuel => 'Tanken erfassen';
 
   @override
-  String get quickActionAddOdometer => 'Kilometerstand hinzufügen';
+  String get quickActionAddOdometer => 'Kilometer erfassen';
 
   @override
   String get quickActionSelectVehicle => 'Fahrzeug auswählen';

@@ -188,7 +188,7 @@ Logit for LubeLogger
 
 ### Short description (max 80 chars)
 ```
-Repostajes, kilometraje, mantenimiento y recordatorios de tu servidor LubeLogger
+Repostajes, kilometraje, mantenimiento y avisos de tu servidor LubeLogger
 ```
 
 ### Full description

@@ -14,10 +14,10 @@ Future<AppLocalizations> loadAppLocalizations() => AppLocalizations.delegate
 /// [AppLocalizations.supportedLocales] with English first. gen-l10n sorts them
 /// alphabetically, and Flutter falls back to the first entry when nothing
 /// matches, so the generated order would send a phone set to Italian to German.
-final List<Locale> appSupportedLocales = [
+final List<Locale> appSupportedLocales = List.unmodifiable([
   const Locale('en'),
   ...AppLocalizations.supportedLocales.where((l) => l.languageCode != 'en'),
-];
+]);
 
 /// The same resolution `MaterialApp` applies to `supportedLocales`, so text
 /// built outside the tree speaks the language of the screen it opens. Matching

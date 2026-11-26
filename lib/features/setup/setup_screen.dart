@@ -220,7 +220,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         ),
       ),
       const SizedBox(width: DashSpace.md),
-      Text(text),
+      Flexible(child: Text(text)),
     ],
   );
 
