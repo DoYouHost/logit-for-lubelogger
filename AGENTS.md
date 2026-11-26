@@ -81,7 +81,8 @@ inside an unrelated change and do not stay silent.
 - `lib/features/<feature>/` — one directory per screen: garage, vehicle (record
   forms and attachments), dashboard, quick actions, settings, setup, sync, bug
   report.
-- `lib/l10n/` — `app_en.arb` (the template) and `app_pl.arb`, plus generated
+- `lib/l10n/` — `app_en.arb` (the template) and `app_pl.arb`, `app_de.arb`, `app_fr.arb`,
+  `app_es.arb`, plus generated
   `app_localizations*.dart`. User-visible text goes through `AppLocalizations`,
   never hardcoded.
 - `test/` mirrors `lib/`. `tool/` holds guard configs and `scroll_bench.sh`.
@@ -143,7 +144,7 @@ inside an unrelated change and do not stay silent.
   ([docs/api-records.md](docs/api-records.md)).
 - **A route only newer servers have goes through `ServerCapabilities`**; an unknown
   version fails open.
-- **Strings:** English and Polish. After editing an `.arb`, run `just l10n-check`
+- **Strings:** English, Polish, German, French and Spanish. After editing an `.arb`, run `just l10n-check`
   (LanguageTool on the strings this branch changed; set `LANGUAGETOOL_URL` to your
   own instance) and `just l10n-glue` (no line ends on a one-letter word). It does
   not catch a phrase that parses and means nothing, so read the copy too.
