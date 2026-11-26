@@ -13,6 +13,27 @@ void main() {
   test('a regional system locale resolves to the bare supported locale', () {
     expect(resolveAppLocale([const Locale('pl', 'PL')]), const Locale('pl'));
     expect(resolveAppLocale([const Locale('en', 'GB')]), const Locale('en'));
+    expect(resolveAppLocale([const Locale('de', 'AT')]), const Locale('de'));
+    expect(resolveAppLocale([const Locale('fr', 'CA')]), const Locale('fr'));
+    expect(resolveAppLocale([const Locale('es', 'MX')]), const Locale('es'));
+  });
+
+  test(
+    'English is the first supported locale, the fallback MaterialApp uses',
+    () {
+      expect(appSupportedLocales.first, const Locale('en'));
+      expect(
+        appSupportedLocales.toSet(),
+        AppLocalizations.supportedLocales.toSet(),
+      );
+    },
+  );
+
+  test('the five shipped languages are exactly the supported ones', () {
+    expect(
+      AppLocalizations.supportedLocales.map((l) => l.languageCode).toSet(),
+      {'en', 'pl', 'de', 'fr', 'es'},
+    );
   });
 
   test('an untranslated first choice falls through to the next one', () {

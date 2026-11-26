@@ -21,6 +21,17 @@ ignored_rules = [
   # "Ustaw jednostki, w jakich…": the rule misses the plural antecedent, and
   # flags "w których" the same way.
   "ZDANIE_PODRZEDNE_Z_KTORY_LUB_JAKI",
+  # German: "Verbinde…", "Wird gesendet…" — the ellipsis closes the word, as in
+  # the English and Polish copy; a no-break space before it would look wrong.
+  "AUSLASSUNGSPUNKTE_LEERZEICHEN",
+  # French: "Contient une note" is a label with its subject left implicit.
+  "IL_DEBUT_DE_PHRASE",
+  # French: "Connecté en tant que {name}" — the placeholder is the missing
+  # noun, which the rule reads as a bare numeral.
+  "DETERMINER_SENT_END",
+  # French: "toutes les 3 heures" — a figure reads better than a spelt number
+  # in a settings note, and the English and Polish copy use one.
+  "NOMBRES_EN_LETTRES_2",
 ]
 
 # Words a dictionary hit on says nothing about, matched case-insensitively.
@@ -35,6 +46,9 @@ known_words = [
   "open", "source",
   # The server's own setting, named as its web UI spells it.
   "Use", "Calculation",
+  # Terms the French and Spanish copy keeps: the abbreviation "moy." (moyenne),
+  # LubeLogger's "Root" role and "proxy".
+  "moy", "root", "proxy",
 ]
 
 # Each file with its LanguageTool language and the plural arm whose wording
@@ -47,3 +61,15 @@ language = "en-US"
 path = "lib/l10n/app_pl.arb"
 language = "pl-PL"
 arm = "many"
+
+[[files]]
+path = "lib/l10n/app_de.arb"
+language = "de-DE"
+
+[[files]]
+path = "lib/l10n/app_fr.arb"
+language = "fr"
+
+[[files]]
+path = "lib/l10n/app_es.arb"
+language = "es"

@@ -96,7 +96,7 @@ prereleases by default, so only testers who opt in see them.
 - The `applicationId` is `page.codeberg.doyouhost.lubelogger_mobile`, and
   `tool/play.toml` calls it frozen: it is the identity of the Play listing, so
   changing it makes a different app. Do not "tidy" it.
-- Store listing assets live in [`store-assets/`](store-assets); the project page
+- Store listing text (all five languages) is in [`play-store-listing.md`](play-store-listing.md); assets live in [`store-assets/`](store-assets); the project page
   and privacy policy are served from `site/` by `.github/workflows/pages.yml`.
 
 ## R8 and resource shrinking: crashes that appear only in release
