@@ -9,10 +9,11 @@ LubeLogger.
 
 Every pull request into `master` or `dev` runs [.github/workflows/ci.yml](.github/workflows/ci.yml):
 `flutter pub get --enforce-lockfile`, `dart format --output=none
---set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test` and a debug
-APK compile. A pull request that touches only `docs/`, `site/`, `reference/` or
+--set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test`, the contract
+tests against real LubeLogger containers (1.6.9, 1.7.0, 1.7.4; `just test-contract`
+adds `latest`) and a debug APK compile. A pull request that touches only `docs/`, `site/`, `reference/` or
 `*.md` skips everything after the path check and still reports green. It runs on
-GitHub-hosted runners as parallel jobs (analyze, test, build) behind one
+GitHub-hosted runners as parallel jobs (analyze, test, contract, build) behind one
 `analyze · test · build` job, the status `master` requires. The pull request is
 opened as a draft by `just release-start`, so CI runs on every push to
 `release/X.Y.Z` through it; there is no `push` trigger, which would run it twice.

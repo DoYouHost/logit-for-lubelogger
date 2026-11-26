@@ -356,18 +356,21 @@ void main() {
 
     for (final write in _costWrites) {
       test(
-        '${write.what} keeps the cost decimals with a dot separator',
+        '${write.what} sends the cost as a JSON number, not a string',
         () async {
+          // A "1234.56" string is 123456 on a server whose culture groups with
+          // "." (de-DE, pl-PL); a number is read back by the culture that wrote
+          // it. test/contract holds this against a real server.
           final (:repo, :adapter) = _repo();
 
           await write.call(repo);
 
-          expect(_body(adapter)['cost'], '1234.56');
+          expect(_body(adapter)['cost'], 1234.56);
         },
       );
     }
 
-    test('a whole-number cost is not padded to decimals', () async {
+    test('a whole-number cost is still a number', () async {
       final (:repo, :adapter) = _repo();
 
       await repo.addRecord(
@@ -379,7 +382,7 @@ void main() {
         odometer: 1000,
       );
 
-      expect(_body(adapter)['cost'], '480');
+      expect(_body(adapter)['cost'], 480);
     });
 
     test('flags go out as words bool.Parse accepts', () async {
@@ -465,8 +468,8 @@ void main() {
       expect(_body(adapter), {
         'date': '2026-04-05',
         'odometer': '317240',
-        'fuelConsumed': '41.53',
-        'cost': '221.5',
+        'fuelConsumed': 41.53,
+        'cost': 221.5,
         'isFillToFull': 'true',
         'missedFuelUp': 'false',
         'startingSoc': '20',
@@ -505,8 +508,8 @@ void main() {
           'vehicleId': '3',
           'date': '2026-04-05',
           'odometer': '317240',
-          'fuelConsumed': '41.53',
-          'cost': '221.5',
+          'fuelConsumed': 41.53,
+          'cost': 221.5,
           'isFillToFull': 'false',
           'missedFuelUp': 'true',
           'startingSoc': '18',
@@ -542,7 +545,7 @@ void main() {
           'date': '2026-04-05',
           if (kind.hasOdometer) 'odometer': '320447',
           'description': 'Work',
-          'cost': '470',
+          'cost': 470,
           'notes': '',
           'tags': '',
           'files': <Map<String, dynamic>>[],
@@ -664,8 +667,8 @@ void main() {
         'description': 'Oil filter',
         'partNumber': 'W 712/95',
         'partSupplier': 'Mann',
-        'partQuantity': '2.5',
-        'cost': '89.99',
+        'partQuantity': 2.5,
+        'cost': 89.99,
         'notes': '',
         'tags': '',
         'files': <Map<String, dynamic>>[],
@@ -687,7 +690,7 @@ void main() {
       expect(_request(adapter).method, 'PUT');
       expect(_request(adapter).path, Endpoints.supplyRecordsUpdate);
       expect(_body(adapter)['id'], '9');
-      expect(_body(adapter)['partQuantity'], '1');
+      expect(_body(adapter)['partQuantity'], 1);
     });
   });
 
@@ -710,7 +713,7 @@ void main() {
       expect(_request(adapter).path, Endpoints.planRecordsAdd);
       expect(_body(adapter), {
         'description': 'Winter tyres',
-        'cost': '480',
+        'cost': 480,
         'type': 'UpgradeRecord',
         'priority': 'Critical',
         'progress': 'InProgress',
