@@ -21,7 +21,7 @@ ignored_rules = [
   # "Ustaw jednostki, w jakich…": the rule misses the plural antecedent, and
   # flags "w których" the same way.
   "ZDANIE_PODRZEDNE_Z_KTORY_LUB_JAKI",
-  # German: "Verbindung wird hergestellt…" — the ellipsis closes the word, as in
+  # German: "Verbinde…", "Wird gesendet…" — the ellipsis closes the word, as in
   # the English and Polish copy; a no-break space before it would look wrong.
   "AUSLASSUNGSPUNKTE_LEERZEICHEN",
   # French: "Contient une note" is a label with its subject left implicit.
