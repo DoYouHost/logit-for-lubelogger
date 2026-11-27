@@ -49,7 +49,10 @@ gets its base switched to `dev` before it is merged.
 6. `git switch dev && git merge origin/master && git push`. This is not cosmetic:
    `ship-dev` counts its builds from the last release tag reachable from `dev`, and
    until `dev` contains the bump commit it numbers them into a version that has
-   already shipped.
+   already shipped. It also carries the release into the next one: `ship` refuses
+   a release branch that does not contain `origin/master`, because one cut from a
+   `dev` without the last release would ship without it (1.1.0 lost the 1.0.2
+   decimal fix that way, issue #40).
 
 The release is published on GitHub before the PR is merged, so waiting for green
 in step 3 is what keeps a red build from reaching Obtainium; `just ship` still runs
